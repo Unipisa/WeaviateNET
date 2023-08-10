@@ -17,15 +17,37 @@ namespace WeaviateNET
             this.Classes = s.Classes;
             this.Maintainer = s.Maintainer;
             this.Name = s.Name;
+
+            foreach (var c in this.Classes)
+            {
+                c._connection = this._connection;
+            }
         }
 
-        public async Task<Class> NewClass(Class c)
+        public async Task<WeaviateClass<P>> NewClass<P>(WeaviateClass<P> c)
         {
             if (_connection == null) throw new Exception($"Empty connection while creating class '{c.Name}'");
+            var flds = typeof(P).GetFields();
+            c.Properties = new List<Property>(flds.Length);
+
+            foreach (var f in typeof(P).GetFields())
+            {
+                // FIXME: not supporting references yet
+                c.Properties.Add(Property.Create(f.FieldType, f.Name));
+            }
             var nc = await _connection.Client.Schema_objects_createAsync(c);
+            
+
             if (nc == null) throw new Exception($"Error while creating the class '{c.Name}'");
-            nc._connection = _connection;
-            return nc;
+            var ret = new WeaviateClass<P>(nc);
+            ret._connection = _connection;
+            return ret;
+        }
+
+        public async Task<SchemaClusterStatus> ClusterStatus()
+        {
+            if (_connection == null) throw new Exception($"Empty connection while retrieving cluster status");
+            return await _connection.Client.Schema_cluster_statusAsync();
         }
     }
 }

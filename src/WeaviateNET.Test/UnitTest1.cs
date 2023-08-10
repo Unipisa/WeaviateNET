@@ -1,7 +1,22 @@
+using System.Collections;
+using System.Text.RegularExpressions;
 using WeaviateNET;
 
 namespace WeaviateNET.Test
 {
+    /// <summary>
+    /// Example of property definition. Notice that you *should* use only
+    /// public fields with low case names (otherwise serialization/deserialization may fail).
+    /// Weaviate corrects property names into lower case.
+    /// </summary>
+    public class Document
+    {
+        public int intData;
+        public string? textData;
+        public DateTime dateData;
+        public string[]? textArrayData;
+    }
+
     [TestClass]
     public class UnitTest1
     {
@@ -11,6 +26,21 @@ namespace WeaviateNET.Test
         public void Init()
         {
             weaviateDB = new WeaviateDB("http://131.114.72.55:8080/v1", "f69c2ec8-991c-44b9-b038-cd39d62f0ea2");
+        }
+
+        [TestCleanup]
+        public async Task CleanupClasses()
+        {
+            Assert.IsNotNull(weaviateDB);
+            await weaviateDB.Schema.Update();
+            foreach (var c in weaviateDB.Schema.Classes)
+            {
+                if (Regex.IsMatch(c.Name, "^Test\\d+$"))
+                {
+                    await c.Delete();
+                }
+            }
+            await weaviateDB.Schema.Update();
         }
 
         [TestMethod]
@@ -36,10 +66,27 @@ namespace WeaviateNET.Test
             var name = $"Test{DateTime.Now.Ticks}";
             await weaviateDB.Schema.Update();
             var n = weaviateDB.Schema.Classes.Count();
-            var c = await weaviateDB.Schema.NewClass(new Class { Name = name });
+            var c = await weaviateDB.Schema.NewClass(new WeaviateClass<NoProperties> { Name = name });
             await weaviateDB.Schema.Update();
             Assert.AreEqual(n + 1, weaviateDB.Schema.Classes.Count());
             Assert.AreEqual(c.Name, name);
+            await c.Delete();
+            await weaviateDB.Schema.Update();
+            Assert.AreEqual(n, weaviateDB.Schema.Classes.Count());
+        }
+
+        [TestMethod]
+        public async Task TestCreateClassWithFields()
+        {
+            Assert.IsNotNull(weaviateDB);
+            var name = $"Test{DateTime.Now.Ticks}";
+            await weaviateDB.Schema.Update();
+            var n = weaviateDB.Schema.Classes.Count();
+            var c = await weaviateDB.Schema.NewClass(new WeaviateClass<Document> { Name = name });
+            await weaviateDB.Schema.Update();
+            Assert.AreEqual(n + 1, weaviateDB.Schema.Classes.Count());
+            Assert.AreEqual(c.Name, name);
+            Assert.AreEqual(c.Properties.Count, typeof(Document).GetFields().Length);
             await c.Delete();
             await weaviateDB.Schema.Update();
             Assert.AreEqual(n, weaviateDB.Schema.Classes.Count());
@@ -55,7 +102,7 @@ namespace WeaviateNET.Test
             var desc = $"Description for {name}";
             await weaviateDB.Schema.Update();
             var n = weaviateDB.Schema.Classes.Count();
-            var c = await weaviateDB.Schema.NewClass(new Class { Name = name });
+            var c = await weaviateDB.Schema.NewClass(new WeaviateClass<NoProperties> { Name = name });
             await weaviateDB.Schema.Update();
             Assert.AreEqual(n + 1, weaviateDB.Schema.Classes.Count());
             Assert.AreEqual(c.Name, name);
@@ -68,5 +115,77 @@ namespace WeaviateNET.Test
             await weaviateDB.Schema.Update();
             Assert.AreEqual(n, weaviateDB.Schema.Classes.Count());
         }
+
+        [TestMethod]
+        public async Task TestClusterStatus()
+        {
+            Assert.IsNotNull(weaviateDB);
+            var s = await weaviateDB.Schema.ClusterStatus();
+            Assert.IsNotNull(s);
+            Assert.IsTrue(s.NodeCount > 0);
+        }
+
+        [TestMethod]
+        public async Task TestAddProperty()
+        {
+            Assert.IsNotNull(weaviateDB);
+            var name = $"Test{DateTime.Now.Ticks}";
+            await weaviateDB.Schema.Update();
+            var n = weaviateDB.Schema.Classes.Count();
+            var c = await weaviateDB.Schema.NewClass(new WeaviateClass<NoProperties> { Name = name });
+            await weaviateDB.Schema.Update();
+            Assert.AreEqual(n + 1, weaviateDB.Schema.Classes.Count());
+            Assert.AreEqual(c.Name, name);
+
+            await c.AddProperty(Property.Create<string>("PropertyName"));
+
+            Assert.IsTrue(c.Properties.Count == 1);
+
+            await c.Delete();
+            await weaviateDB.Schema.Update();
+            Assert.AreEqual(n, weaviateDB.Schema.Classes.Count());
+        }
+
+        //This test covers only reading shard status, a test for setting the status needed in future
+        [TestMethod]
+        public async Task TestShards()
+        {
+            Assert.IsNotNull(weaviateDB);
+            var name = $"Test{DateTime.Now.Ticks}";
+            await weaviateDB.Schema.Update();
+            var n = weaviateDB.Schema.Classes.Count();
+            var c = await weaviateDB.Schema.NewClass(new WeaviateClass<NoProperties> { Name = name });
+            await weaviateDB.Schema.Update();
+            Assert.AreEqual(n + 1, weaviateDB.Schema.Classes.Count());
+            Assert.AreEqual(c.Name, name);
+
+            var ret = await c.GetShardsStatus();
+            Assert.IsTrue(ret.Count > 0);
+            await c.Delete();
+            await weaviateDB.Schema.Update();
+            Assert.AreEqual(n, weaviateDB.Schema.Classes.Count());
+        }
+
+        //This test require better understanding of multitenancy model
+        //[TestMethod]
+        //public async Task TestTenants()
+        //{
+        //    Assert.IsNotNull(weaviateDB);
+        //    var name = $"Test{DateTime.Now.Ticks}";
+        //    await weaviateDB.Schema.Update();
+        //    var n = weaviateDB.Schema.Classes.Count();
+        //    var c = await weaviateDB.Schema.NewClass(new Class { Name = name, MultiTenancyConfig=new MultiTenancyConfig() { Enabled=true } }) ;
+        //    await weaviateDB.Schema.Update();
+        //    Assert.AreEqual(n + 1, weaviateDB.Schema.Classes.Count());
+        //    Assert.AreEqual(c.Name, name);
+
+        //    await c.AddTenants(new List<Tenant>(new Tenant[] { new Tenant() { Name = "Tenant A" }, new Tenant() { Name = "Tenant B" } }));
+
+        //    var ret = await c.GetTenants();
+
+        //    await c.Delete();
+        //    await weaviateDB.Schema.Update();
+        //    Assert.AreEqual(n, weaviateDB.Schema.Classes.Count());
+        //}
     }
 }
