@@ -1,9 +1,47 @@
-﻿using System.Collections;
+﻿using Newtonsoft.Json;
+using System.Collections;
+using System.Globalization;
 using System.Text.RegularExpressions;
 using WeaviateNET;
+using CsvHelper;
+using CsvHelper.Configuration.Attributes;
+using CsvHelper.Configuration;
 
 namespace WeaviateNET.Test
 {
+    public class Movie
+    {
+        public string? film;
+        public string? genre;
+        public string? leadStudio;
+        public int audienceScore;
+        public double profitability;
+        public int rottenTomatoes;
+        public double worldWideGross;
+        public int year;
+    }
+
+    public class MovieCsvRecord
+    {
+        [Name("Film")]
+        public string? film { get; set; }
+        [Name("Genre")]
+        public string? genre { get; set; }
+        [Name("Lead Studio")]
+        public string? leadStudio { get; set; }
+        [Name("Audience score %")]
+        public int audienceScore { get; set; }
+        [Name("Profitability")]
+        public double profitability { get; set; }
+        [Name("Rotten Tomatoes %")]
+        public int rottenTomatoes { get; set; }
+        [Name("Worldwide Gross")]
+        public double worldWideGross { get; set; }
+        [Name("Year")]
+        public int year { get; set; }
+    }
+
+
     [TestClass]
     public class TestContent
     {
@@ -23,6 +61,50 @@ namespace WeaviateNET.Test
             return c;
         }
 
+        private async Task PopulateMovieDB()
+        {
+            Assert.IsNotNull(weaviateDB);
+            await weaviateDB.Schema.Update();
+            var c = weaviateDB.Schema.GetClass<Movie>("MovieDBTest");
+
+            // To clean the DB usually is commented
+            //if (c != null)
+            //{
+            //    await c.Delete();
+            //    c = null;
+            //}
+
+            if (c == null)
+            {
+                c = await weaviateDB.Schema.NewClass<Movie>("MovieDBTest");
+
+                var dbfile = System.IO.Path.Combine((new System.IO.FileInfo(GetType().Assembly.Location)).Directory.FullName, "moviesdb.csv");
+                using (var reader = new System.IO.StreamReader(dbfile))
+                using (var csv = new CsvHelper.CsvReader(reader, CultureInfo.InvariantCulture))
+                {
+                    var records = csv.GetRecords<MovieCsvRecord>();
+                    var toadd = new List<WeaviateObject<Movie>>();
+                    var num = 0;
+                    foreach (var r in records)
+                    {
+                        var d = c.Create();
+                        d.Properties.film = r.film;
+                        d.Properties.genre = r.genre;
+                        d.Properties.leadStudio = r.leadStudio;
+                        d.Properties.audienceScore = r.audienceScore;
+                        d.Properties.profitability = r.profitability;
+                        d.Properties.rottenTomatoes = r.rottenTomatoes;
+                        d.Properties.worldWideGross = r.worldWideGross;
+                        d.Properties.year = r.year;
+                        toadd.Add(d);
+                        num++;
+                    }
+                    var ret = await c.Add(toadd);
+                    Assert.AreEqual(num, ret.Count);
+                }
+            }
+        }
+
         [TestInitialize]
         public void Init()
         {
@@ -31,6 +113,9 @@ namespace WeaviateNET.Test
             j.Wait();
             wclass = j.Result;
             dataValue = DateTime.Now;
+
+            var dbj = PopulateMovieDB();
+            dbj.Wait();
         }
 
         [TestCleanup]

@@ -49,6 +49,15 @@ namespace WeaviateNET
             return ret;
         }
 
+        public WeaviateClass<P>? GetClass<P>(string name) where P : class, new()
+        {
+            var c = this.Classes.FirstOrDefault(c => c.Name == name);
+            if (c == null) return null;
+            var ret = new WeaviateClass<P>(c);
+            ret._connection = _connection; // Connection is *not* copied
+            return ret;
+        }
+
         public async Task<SchemaClusterStatus> ClusterStatus()
         {
             if (_connection == null) throw new Exception($"Empty connection while retrieving cluster status");

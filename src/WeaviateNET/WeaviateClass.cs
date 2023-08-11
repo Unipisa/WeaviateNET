@@ -130,7 +130,7 @@ namespace WeaviateNET
 
         public async Task<ICollection<WeaviateObject<P>>> Add(ICollection<WeaviateObject<P>> objects, string consistency_level = "QUORUM")
         {
-            if (_connection == null) throw new Exception($"Empty connection while adding object to class '{this.Name}'");
+            if (_connection == null) throw new Exception($"Empty connection while batch adding objects to class '{this.Name}'");
             var b = new Body<P>();
             b.Objects = objects;
             var ret = await _connection.Client.Batch_objects_createAsync(b, consistency_level);
@@ -154,6 +154,12 @@ namespace WeaviateNET
                 }
             }
             return lret;
+        }
+
+        public async Task<BatchDeleteResponse> DeleteObjects(BatchDelete q, string consistency_level = "QUORUM", string? tenant = null)
+        {
+            if (_connection == null) throw new Exception($"Empty connection while batch deleting objects to class '{this.Name}'");
+            return await _connection.Client.Batch_objects_deleteAsync(q, consistency_level, tenant);
         }
 
         public async Task<WeaviateObject<P>> Get(Guid id, string consistency_level = "QUORUM", string? include = null, string? node_name = null, string? tenant = null)
