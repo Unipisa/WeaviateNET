@@ -1,7 +1,10 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Reflection.Metadata;
+using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -9,6 +12,7 @@ namespace WeaviateNET
 {
     public partial class WeaviateClassBase
     {
+        [JsonIgnore]
         internal WeaviateDB? _connection;
 
         internal void CopyFrom(WeaviateClassBase src)
@@ -59,13 +63,6 @@ namespace WeaviateNET
             await this.Update();
         }
 
-        public async Task Add<P>(WeaviateNET.WeaviateObject<P> obj, string consistency_level="QUORUM")
-        {
-            if (_connection == null) throw new Exception($"Empty connection while adding object to class '{this.Name}'");
-            obj.Class = this.Name;
-            var o = await _connection.Client.Objects_createAsync(obj, consistency_level);
-        }
-
         #region Shards
         public async Task<ICollection<ShardStatusGetResponse>> GetShardsStatus()
         {
@@ -104,15 +101,90 @@ namespace WeaviateNET
         #endregion
     }
 
-    public class WeaviateClass<P> : WeaviateClassBase
+    public class WeaviateClass<P> : WeaviateClassBase where P : class, new()
     {
-        public WeaviateClass() : base()
+        internal WeaviateClass() : base()
         {
         }
 
-        public WeaviateClass(WeaviateClassBase b) : this()
+        internal WeaviateClass(WeaviateClassBase b) : this()
         {
             this.CopyFrom(b);
+        }
+
+        public WeaviateObject<P> Create()
+        {
+            var ret = new WeaviateObject<P>();
+            ret.Class = this.Name;
+            ret.classType = this;
+            return ret;
+        }
+
+        public async Task Add(WeaviateObject<P> obj, string consistency_level = "QUORUM")
+        {
+            if (_connection == null) throw new Exception($"Empty connection while adding object to class '{this.Name}'");
+            obj.Class = this.Name;
+            var o = await _connection.Client.Objects_createAsync(obj, consistency_level);
+            obj.CopyFrom(o);
+        }
+
+        public async Task<ICollection<WeaviateObject<P>>> Add(ICollection<WeaviateObject<P>> objects, string consistency_level = "QUORUM")
+        {
+            if (_connection == null) throw new Exception($"Empty connection while adding object to class '{this.Name}'");
+            var b = new Body<P>();
+            b.Objects = objects;
+            var ret = await _connection.Client.Batch_objects_createAsync(b, consistency_level);
+            var idx = new Dictionary<Guid, ObjectsGetResponse<P>>();
+            foreach (var r in ret) {
+                if (r.Result.Status == Result2Status.SUCCESS)
+                {
+                    if (r.Id.HasValue) 
+                    { 
+                        idx.Add((Guid)r.Id, r);
+                    }
+                }
+            }
+            var lret = new List<WeaviateObject<P>>();
+            foreach (var o in objects)
+            {
+                if (o.Id.HasValue && idx.ContainsKey((Guid)o.Id))
+                {
+                    o.CopyFrom(idx[(Guid)o.Id]);
+                    lret.Add(o);
+                }
+            }
+            return lret;
+        }
+
+        public async Task<WeaviateObject<P>> Get(Guid id, string consistency_level = "QUORUM", string? include = null, string? node_name = null, string? tenant = null)
+        {
+            if (_connection == null) throw new Exception($"Empty connection while fetching object '{id}'");
+            var ret = await _connection.Client.Objects_class_getAsync<P>(this.Name, id, include, consistency_level, node_name, tenant);
+            return ret;
+        }
+
+        public async Task<bool> Validate(WeaviateObject<P> obj)
+        {
+            if (_connection == null) throw new Exception($"Empty connection while validating object '{obj.Id}'");
+            try
+            {
+                await _connection.Client.Objects_validateAsync(obj);
+                return true;
+            } catch {
+                return false;
+            }
+        }
+
+        public async Task<bool> ExistsObject(Guid id,string consistency_level = "QUORUM", string? tenant=null)
+        {
+            if (_connection == null) throw new Exception($"Empty connection while checking object '{id}'");
+            try
+            {
+                await _connection.Client.Objects_class_headAsync(this.Name, id, consistency_level, tenant);
+                return true;
+            } catch {
+                return false;
+            }
         }
     }
 }

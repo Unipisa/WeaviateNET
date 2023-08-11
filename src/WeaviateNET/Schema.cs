@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,7 +9,9 @@ namespace WeaviateNET
 {
     public partial class Schema
     {
+        [JsonIgnore]
         internal WeaviateDB? _connection;
+
         public async Task Update()
         {
             if (_connection == null) throw new Exception("Empty connection while loading schema");
@@ -24,8 +27,10 @@ namespace WeaviateNET
             }
         }
 
-        public async Task<WeaviateClass<P>> NewClass<P>(WeaviateClass<P> c)
+        public async Task<WeaviateClass<P>> NewClass<P>(string name) where P : class, new()
         {
+            var c = new WeaviateClass<P>() { Name=name };
+
             if (_connection == null) throw new Exception($"Empty connection while creating class '{c.Name}'");
             var flds = typeof(P).GetFields();
             c.Properties = new List<Property>(flds.Length);

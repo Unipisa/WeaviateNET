@@ -18,7 +18,7 @@ namespace WeaviateNET.Test
     }
 
     [TestClass]
-    public class UnitTest1
+    public class TestSchema
     {
         WeaviateDB? weaviateDB;
 
@@ -66,7 +66,7 @@ namespace WeaviateNET.Test
             var name = $"Test{DateTime.Now.Ticks}";
             await weaviateDB.Schema.Update();
             var n = weaviateDB.Schema.Classes.Count();
-            var c = await weaviateDB.Schema.NewClass(new WeaviateClass<NoProperties> { Name = name });
+            var c = await weaviateDB.Schema.NewClass<NoProperties>(name);
             await weaviateDB.Schema.Update();
             Assert.AreEqual(n + 1, weaviateDB.Schema.Classes.Count());
             Assert.AreEqual(c.Name, name);
@@ -82,7 +82,7 @@ namespace WeaviateNET.Test
             var name = $"Test{DateTime.Now.Ticks}";
             await weaviateDB.Schema.Update();
             var n = weaviateDB.Schema.Classes.Count();
-            var c = await weaviateDB.Schema.NewClass(new WeaviateClass<Document> { Name = name });
+            var c = await weaviateDB.Schema.NewClass<Document>(name);
             await weaviateDB.Schema.Update();
             Assert.AreEqual(n + 1, weaviateDB.Schema.Classes.Count());
             Assert.AreEqual(c.Name, name);
@@ -102,7 +102,7 @@ namespace WeaviateNET.Test
             var desc = $"Description for {name}";
             await weaviateDB.Schema.Update();
             var n = weaviateDB.Schema.Classes.Count();
-            var c = await weaviateDB.Schema.NewClass(new WeaviateClass<NoProperties> { Name = name });
+            var c = await weaviateDB.Schema.NewClass<NoProperties>(name);
             await weaviateDB.Schema.Update();
             Assert.AreEqual(n + 1, weaviateDB.Schema.Classes.Count());
             Assert.AreEqual(c.Name, name);
@@ -132,7 +132,7 @@ namespace WeaviateNET.Test
             var name = $"Test{DateTime.Now.Ticks}";
             await weaviateDB.Schema.Update();
             var n = weaviateDB.Schema.Classes.Count();
-            var c = await weaviateDB.Schema.NewClass(new WeaviateClass<NoProperties> { Name = name });
+            var c = await weaviateDB.Schema.NewClass<NoProperties>(name);
             await weaviateDB.Schema.Update();
             Assert.AreEqual(n + 1, weaviateDB.Schema.Classes.Count());
             Assert.AreEqual(c.Name, name);
@@ -140,6 +140,24 @@ namespace WeaviateNET.Test
             await c.AddProperty(Property.Create<string>("PropertyName"));
 
             Assert.IsTrue(c.Properties.Count == 1);
+
+            await c.Delete();
+            await weaviateDB.Schema.Update();
+            Assert.AreEqual(n, weaviateDB.Schema.Classes.Count());
+        }
+
+        [TestMethod]
+        public async Task TestAddObject()
+        {
+            Assert.IsNotNull(weaviateDB);
+            var name = $"Test{DateTime.Now.Ticks}";
+            await weaviateDB.Schema.Update();
+            var n = weaviateDB.Schema.Classes.Count();
+            var c = await weaviateDB.Schema.NewClass<Document>(name);
+            await weaviateDB.Schema.Update();
+            Assert.AreEqual(n + 1, weaviateDB.Schema.Classes.Count());
+            Assert.AreEqual(c.Name, name);
+            Assert.AreEqual(c.Properties.Count, typeof(Document).GetFields().Length);
 
             await c.Delete();
             await weaviateDB.Schema.Update();
@@ -154,7 +172,7 @@ namespace WeaviateNET.Test
             var name = $"Test{DateTime.Now.Ticks}";
             await weaviateDB.Schema.Update();
             var n = weaviateDB.Schema.Classes.Count();
-            var c = await weaviateDB.Schema.NewClass(new WeaviateClass<NoProperties> { Name = name });
+            var c = await weaviateDB.Schema.NewClass<NoProperties>(name);
             await weaviateDB.Schema.Update();
             Assert.AreEqual(n + 1, weaviateDB.Schema.Classes.Count());
             Assert.AreEqual(c.Name, name);

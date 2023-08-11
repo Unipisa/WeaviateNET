@@ -949,7 +949,7 @@ namespace WeaviateNET
         /// <param name="consistency_level">Determines how many replicas must acknowledge a request before it is considered successful</param>
         /// <returns>Request succeeded, see response body to get detailed information about each batched item.</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ObjectsGetResponse<P>>> Batch_objects_createAsync<P>(Body<P> body, string consistency_level)
+        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ObjectsGetResponse<P>>> Batch_objects_createAsync<P>(Body<P> body, string consistency_level) where P : class, new()
         {
             return Batch_objects_createAsync<P>(body, consistency_level, System.Threading.CancellationToken.None);
         }
@@ -964,7 +964,7 @@ namespace WeaviateNET
         /// <param name="consistency_level">Determines how many replicas must acknowledge a request before it is considered successful</param>
         /// <returns>Request succeeded, see response body to get detailed information about each batched item.</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ObjectsGetResponse<P>>> Batch_objects_createAsync<P>(Body<P> body, string consistency_level, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ObjectsGetResponse<P>>> Batch_objects_createAsync<P>(Body<P> body, string consistency_level, System.Threading.CancellationToken cancellationToken) where P : class, new()
         {
             if (body == null)
                 throw new System.ArgumentNullException("body");
@@ -2287,7 +2287,7 @@ namespace WeaviateNET
         /// <param name="tenant">Specifies the tenant in a request targeting a multi-tenant class</param>
         /// <returns>Successful response.</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<ObjectsListResponse<P>> Objects_listAsync<P>(string after, long? offset, long? limit, string include, string sort, string order, string @class, string tenant)
+        public virtual System.Threading.Tasks.Task<ObjectsListResponse<P>> Objects_listAsync<P>(string after, long? offset, long? limit, string include, string sort, string order, string @class, string tenant) where P : class, new()
         {
             return Objects_listAsync<P>(after, offset, limit, include, sort, order, @class, tenant, System.Threading.CancellationToken.None);
         }
@@ -2309,7 +2309,7 @@ namespace WeaviateNET
         /// <param name="tenant">Specifies the tenant in a request targeting a multi-tenant class</param>
         /// <returns>Successful response.</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<ObjectsListResponse<P>> Objects_listAsync<P>(string after, long? offset, long? limit, string include, string sort, string order, string @class, string tenant, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<ObjectsListResponse<P>> Objects_listAsync<P>(string after, long? offset, long? limit, string include, string sort, string order, string @class, string tenant, System.Threading.CancellationToken cancellationToken) where P : class, new()
         {
             var urlBuilder_ = new System.Text.StringBuilder();
             urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/objects?");
@@ -2467,7 +2467,7 @@ namespace WeaviateNET
         /// <param name="consistency_level">Determines how many replicas must acknowledge a request before it is considered successful</param>
         /// <returns>Object created.</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<WeaviateObject<P>> Objects_createAsync<P>(WeaviateObject<P> body, string consistency_level)
+        public virtual System.Threading.Tasks.Task<WeaviateObject<P>> Objects_createAsync<P>(WeaviateObject<P> body, string consistency_level) where P : class, new()
         {
             return Objects_createAsync(body, consistency_level, System.Threading.CancellationToken.None);
         }
@@ -2482,7 +2482,7 @@ namespace WeaviateNET
         /// <param name="consistency_level">Determines how many replicas must acknowledge a request before it is considered successful</param>
         /// <returns>Object created.</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<WeaviateObject<P>> Objects_createAsync<P>(WeaviateObject<P> body, string consistency_level, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<WeaviateObject<P>> Objects_createAsync<P>(WeaviateObject<P> body, string consistency_level, System.Threading.CancellationToken cancellationToken) where P : class, new()
         {
             if (body == null)
                 throw new System.ArgumentNullException("body");
@@ -2612,7 +2612,7 @@ namespace WeaviateNET
         /// </remarks>
         /// <returns>Successfully validated.</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task Objects_validateAsync<P>(WeaviateObject<P> body)
+        public virtual System.Threading.Tasks.Task Objects_validateAsync<P>(WeaviateObject<P> body) where P : class, new()
         {
             return Objects_validateAsync(body, System.Threading.CancellationToken.None);
         }
@@ -2626,7 +2626,7 @@ namespace WeaviateNET
         /// </remarks>
         /// <returns>Successfully validated.</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task Objects_validateAsync<P>(WeaviateObject<P> body, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task Objects_validateAsync<P>(WeaviateObject<P> body, System.Threading.CancellationToken cancellationToken) where P : class, new()
         {
             if (body == null)
                 throw new System.ArgumentNullException("body");
@@ -2740,7 +2740,7 @@ namespace WeaviateNET
         /// <param name="tenant">Specifies the tenant in a request targeting a multi-tenant class</param>
         /// <returns>Successful response.</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<WeaviateObject<P>> Objects_class_getAsync<P>(string className, System.Guid id, string include, string consistency_level, string node_name, string tenant)
+        public virtual System.Threading.Tasks.Task<WeaviateObject<P>> Objects_class_getAsync<P>(string className, System.Guid id, string include, string consistency_level, string node_name, string tenant) where P : class, new()
         {
             return Objects_class_getAsync<P>(className, id, include, consistency_level, node_name, tenant, System.Threading.CancellationToken.None);
         }
@@ -2759,7 +2759,7 @@ namespace WeaviateNET
         /// <param name="tenant">Specifies the tenant in a request targeting a multi-tenant class</param>
         /// <returns>Successful response.</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<WeaviateObject<P>> Objects_class_getAsync<P>(string className, System.Guid id, string include, string consistency_level, string node_name, string tenant, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<WeaviateObject<P>> Objects_class_getAsync<P>(string className, System.Guid id, string include, string consistency_level, string node_name, string tenant, System.Threading.CancellationToken cancellationToken) where P : class, new()
         {
             if (className == null)
                 throw new System.ArgumentNullException("className");
@@ -2910,7 +2910,7 @@ namespace WeaviateNET
         /// <param name="consistency_level">Determines how many replicas must acknowledge a request before it is considered successful</param>
         /// <returns>Successfully received.</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<WeaviateObject<P>> Objects_class_putAsync<P>(string className, System.Guid id, WeaviateObject<P> body, string consistency_level)
+        public virtual System.Threading.Tasks.Task<WeaviateObject<P>> Objects_class_putAsync<P>(string className, System.Guid id, WeaviateObject<P> body, string consistency_level) where P : class, new()
         {
             return Objects_class_putAsync(className, id, body, consistency_level, System.Threading.CancellationToken.None);
         }
@@ -2926,7 +2926,7 @@ namespace WeaviateNET
         /// <param name="consistency_level">Determines how many replicas must acknowledge a request before it is considered successful</param>
         /// <returns>Successfully received.</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<WeaviateObject<P>> Objects_class_putAsync<P>(string className, System.Guid id, WeaviateObject<P> body, string consistency_level, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<WeaviateObject<P>> Objects_class_putAsync<P>(string className, System.Guid id, WeaviateObject<P> body, string consistency_level, System.Threading.CancellationToken cancellationToken) where P : class, new()
         {
             if (className == null)
                 throw new System.ArgumentNullException("className");
@@ -3366,7 +3366,7 @@ namespace WeaviateNET
         /// <param name="consistency_level">Determines how many replicas must acknowledge a request before it is considered successful</param>
         /// <returns>Successfully applied. No content provided.</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task Objects_class_patchAsync<P>(string className, System.Guid id, WeaviateObject<P> body, string consistency_level)
+        public virtual System.Threading.Tasks.Task Objects_class_patchAsync<P>(string className, System.Guid id, WeaviateObject<P> body, string consistency_level) where P : class, new()
         {
             return Objects_class_patchAsync(className, id, body, consistency_level, System.Threading.CancellationToken.None);
         }
@@ -3384,7 +3384,7 @@ namespace WeaviateNET
         /// <param name="consistency_level">Determines how many replicas must acknowledge a request before it is considered successful</param>
         /// <returns>Successfully applied. No content provided.</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task Objects_class_patchAsync<P>(string className, System.Guid id, WeaviateObject<P> body, string consistency_level, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task Objects_class_patchAsync<P>(string className, System.Guid id, WeaviateObject<P> body, string consistency_level, System.Threading.CancellationToken cancellationToken) where P : class, new()
         {
             if (className == null)
                 throw new System.ArgumentNullException("className");
@@ -4036,7 +4036,7 @@ namespace WeaviateNET
         /// <returns>Successful response.</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         [System.Obsolete]
-        public virtual System.Threading.Tasks.Task<WeaviateObject<P>> Objects_getAsync<P>(System.Guid id, string include)
+        public virtual System.Threading.Tasks.Task<WeaviateObject<P>> Objects_getAsync<P>(System.Guid id, string include) where P : class, new()
         {
             return Objects_getAsync<P>(id, include, System.Threading.CancellationToken.None);
         }
@@ -4053,7 +4053,7 @@ namespace WeaviateNET
         /// <returns>Successful response.</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         [System.Obsolete]
-        public virtual async System.Threading.Tasks.Task<WeaviateObject<P>> Objects_getAsync<P>(System.Guid id, string include, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<WeaviateObject<P>> Objects_getAsync<P>(System.Guid id, string include, System.Threading.CancellationToken cancellationToken) where P : class, new()
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
@@ -4179,7 +4179,7 @@ namespace WeaviateNET
         /// <returns>Successfully received.</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         [System.Obsolete]
-        public virtual System.Threading.Tasks.Task<WeaviateObject<P>> Objects_updateAsync<P>(System.Guid id, WeaviateObject<P> body, string consistency_level)
+        public virtual System.Threading.Tasks.Task<WeaviateObject<P>> Objects_updateAsync<P>(System.Guid id, WeaviateObject<P> body, string consistency_level) where P : class, new()
         {
             return Objects_updateAsync(id, body, consistency_level, System.Threading.CancellationToken.None);
         }
@@ -4196,7 +4196,7 @@ namespace WeaviateNET
         /// <returns>Successfully received.</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         [System.Obsolete]
-        public virtual async System.Threading.Tasks.Task<WeaviateObject<P>> Objects_updateAsync<P>(System.Guid id, WeaviateObject<P> body, string consistency_level, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<WeaviateObject<P>> Objects_updateAsync<P>(System.Guid id, WeaviateObject<P> body, string consistency_level, System.Threading.CancellationToken cancellationToken) where P : class, new()
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
@@ -4583,7 +4583,7 @@ namespace WeaviateNET
         /// <returns>Successfully applied. No content provided.</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         [System.Obsolete]
-        public virtual System.Threading.Tasks.Task Objects_patchAsync<P>(System.Guid id, WeaviateObject<P> body, string consistency_level)
+        public virtual System.Threading.Tasks.Task Objects_patchAsync<P>(System.Guid id, WeaviateObject<P> body, string consistency_level) where P : class, new()
         {
             return Objects_patchAsync(id, body, consistency_level, System.Threading.CancellationToken.None);
         }
@@ -4601,7 +4601,7 @@ namespace WeaviateNET
         /// <returns>Successfully applied. No content provided.</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         [System.Obsolete]
-        public virtual async System.Threading.Tasks.Task Objects_patchAsync<P>(System.Guid id, WeaviateObject<P> body, string consistency_level, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task Objects_patchAsync<P>(System.Guid id, WeaviateObject<P> body, string consistency_level, System.Threading.CancellationToken cancellationToken) where P : class, new()
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
@@ -7736,7 +7736,7 @@ namespace WeaviateNET
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.19.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ObjectsGetResponse<P> : WeaviateObject<P>
+    public partial class ObjectsGetResponse<P> : WeaviateObject<P> where P : class, new()
     {
         [Newtonsoft.Json.JsonProperty("deprecations", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<Deprecation> Deprecations { get; set; }
@@ -7753,7 +7753,7 @@ namespace WeaviateNET
     /// List of Objects.
     /// </summary>
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.19.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ObjectsListResponse<P>
+    public partial class ObjectsListResponse<P> where P : class, new()
     {
         [Newtonsoft.Json.JsonProperty("deprecations", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<Deprecation> Deprecations { get; set; }
@@ -7776,7 +7776,7 @@ namespace WeaviateNET
     /// Either a JSONPatch document as defined by RFC 6902 (from, op, path, value), or a merge document (RFC 7396).
     /// </summary>
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.19.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class PatchDocumentAction<P>
+    public partial class PatchDocumentAction<P> where P : class, new()
     {
         /// <summary>
         /// A string containing a JSON Pointer value.
@@ -7814,7 +7814,7 @@ namespace WeaviateNET
     /// Either a JSONPatch document as defined by RFC 6902 (from, op, path, value), or a merge document (RFC 7396).
     /// </summary>
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.19.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class PatchDocumentObject<P>
+    public partial class PatchDocumentObject<P> where P : class, new()
     {
         /// <summary>
         /// A string containing a JSON Pointer value.
@@ -8382,7 +8382,7 @@ namespace WeaviateNET
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.19.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class Body<P>
+    public partial class Body<P> where P : class, new()
     {
         /// <summary>
         /// Define which fields need to be returned. Default value is ALL
