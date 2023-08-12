@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Configuration;
 using System.Collections;
 using System.Text.RegularExpressions;
 using WeaviateNET;
@@ -21,11 +22,16 @@ namespace WeaviateNET.Test
     public class TestSchema
     {
         WeaviateDB? weaviateDB;
+        IConfigurationRoot? Configuration;
 
         [TestInitialize]
         public void Init()
         {
-            weaviateDB = new WeaviateDB("http://131.114.72.55:8080/v1", "f69c2ec8-991c-44b9-b038-cd39d62f0ea2");
+            IConfigurationBuilder config = new ConfigurationBuilder()
+            .AddUserSecrets<TestSchema>();
+            Configuration = config.Build();
+
+            weaviateDB = new WeaviateDB(Configuration["Weaviate:ServiceEndpoint"], Configuration["Weaviate:ApiKey"]);
         }
 
         [TestCleanup]

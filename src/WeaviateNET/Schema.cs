@@ -63,5 +63,18 @@ namespace WeaviateNET
             if (_connection == null) throw new Exception($"Empty connection while retrieving cluster status");
             return await _connection.Client.Schema_cluster_statusAsync();
         }
+
+        public async Task<GraphQLResponse> RawQuery(GraphQLQuery query)
+        {
+            if (_connection == null) throw new Exception($"Empty connection while querying schema '{query}'");
+            return await _connection.Client.Graphql_postAsync(query);
+        }
+
+        public async Task<ICollection<GraphQLResponse>> RawQueryBatch(ICollection<GraphQLQuery> queries)
+        {
+            if (_connection == null) throw new Exception($"Empty connection while querying schema '{queries}'");
+            return await _connection.Client.Graphql_batchAsync(queries);
+        }
+
     }
 }

@@ -1,18 +1,51 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Title>Client library for Weaviate vector DB</Title>
+    <Description>This is a .NET library client to interact with Weaviate vector DB. It is a library designed to provide all the Weaviate DB features.</Description>
+    <Copyright>(C) 2023</Copyright>
+    <Company>Antonio Cisternino</Company>
+    <Authors>Antonio Cisternino</Authors>
+    <PackageProjectUrl>https://github.com/Unipisa/WeaviateNET</PackageProjectUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RepositoryUrl>https://github.com/Unipisa/WeaviateNET</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageId>$(AssemblyName)</PackageId>
+    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+    <Configurations>Debug;Release;Release 6.0;Debug 6.0</Configurations>
+    <Version>1.20.5</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DefineConstants>$(DefineConstants);AUTO_GENERATE_OID</DefineConstants>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug 6.0|AnyCPU'">
+    <DefineConstants>$(DefineConstants);AUTO_GENERATE_OID</DefineConstants>
+  </PropertyGroup>
+
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <DefineConstants>$(DefineConstants);AUTO_GENERATE_OID</DefineConstants>
   </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release 6.0|AnyCPU'">
+    <DefineConstants>$(DefineConstants);AUTO_GENERATE_OID</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\LICENSE.txt">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="..\..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.ApiDescription.Client" Version="8.0.0-preview.6.23329.11">

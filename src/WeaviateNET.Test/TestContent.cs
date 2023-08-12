@@ -6,6 +6,8 @@ using WeaviateNET;
 using CsvHelper;
 using CsvHelper.Configuration.Attributes;
 using CsvHelper.Configuration;
+using Newtonsoft.Json.Linq;
+using Microsoft.Extensions.Configuration;
 
 namespace WeaviateNET.Test
 {
@@ -46,6 +48,7 @@ namespace WeaviateNET.Test
     public class TestContent
     {
         WeaviateDB? weaviateDB;
+        IConfigurationRoot? Configuration;
         WeaviateClass<Document>? wclass;
         // Ensure the same value in object creations
         DateTime dataValue;
@@ -78,7 +81,9 @@ namespace WeaviateNET.Test
             {
                 c = await weaviateDB.Schema.NewClass<Movie>("MovieDBTest");
 
-                var dbfile = System.IO.Path.Combine((new System.IO.FileInfo(GetType().Assembly.Location)).Directory.FullName, "moviesdb.csv");
+                var dlllocation = new System.IO.FileInfo(GetType().Assembly.Location);
+                Assert.IsNotNull(dlllocation.Directory);
+                var dbfile = System.IO.Path.Combine(dlllocation.Directory.FullName, "moviesdb.csv");
                 using (var reader = new System.IO.StreamReader(dbfile))
                 using (var csv = new CsvHelper.CsvReader(reader, CultureInfo.InvariantCulture))
                 {
@@ -108,7 +113,13 @@ namespace WeaviateNET.Test
         [TestInitialize]
         public void Init()
         {
-            weaviateDB = new WeaviateDB("http://131.114.72.55:8080/v1", "f69c2ec8-991c-44b9-b038-cd39d62f0ea2");
+
+            IConfigurationBuilder config = new ConfigurationBuilder()
+            .AddUserSecrets<TestSchema>();
+            Configuration = config.Build();
+
+            weaviateDB = new WeaviateDB(Configuration["Weaviate:ServiceEndpoint"], Configuration["Weaviate:ApiKey"]);
+
             var j = CreateClass<Document>();
             j.Wait();
             wclass = j.Result;
@@ -273,6 +284,40 @@ namespace WeaviateNET.Test
             Assert.IsNotNull(data.Id);
 
             Assert.IsTrue(await wclass.Validate(data));
+        }
+
+        [TestMethod]
+        public async Task TestGraphQLRaw()
+        {
+            Assert.IsNotNull(weaviateDB);
+            var q = new GraphQLQuery();
+            q.Query = @"{
+  Get {
+    MovieDBTest(
+      limit: 5
+    )
+    {
+      film
+      genre
+      leadStudio
+      audienceScore
+      profitability
+      rottenTomatoes
+      worldWideGross
+      year
+    }
+  }
+}";
+            var ret = await weaviateDB.Schema.RawQuery(q);
+            Assert.IsNotNull(ret);
+            Assert.IsNull(ret.Errors);
+            var d = ret.Data["Get"];
+            Assert.IsNotNull(d);
+            var data = d["MovieDBTest"];
+            Assert.IsNotNull(data);
+            var a = data.ToObject<Movie[]>();
+            Assert.IsNotNull(a);
+            Assert.AreEqual(a.Length, 5);
         }
 
 

@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WeaviateNET", "src\WeaviateNET\WeaviateNET.csproj", "{E1EF0043-E170-446B-B9BD-A82B7E87D228}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WeaviateNET", "src\WeaviateNET\WeaviateNET.csproj", "{E1EF0043-E170-446B-B9BD-A82B7E87D228}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WeaviateNET.Test", "src\WeaviateNET.Test\WeaviateNET.Test.csproj", "{B4EC7338-8B8C-402A-AC21-E1C982563DCC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WeaviateNET.Test", "src\WeaviateNET.Test\WeaviateNET.Test.csproj", "{B4EC7338-8B8C-402A-AC21-E1C982563DCC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
