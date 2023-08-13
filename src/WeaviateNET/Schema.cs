@@ -76,5 +76,34 @@ namespace WeaviateNET
             return await _connection.Client.Graphql_batchAsync(queries);
         }
 
+        public async Task<BackupCreateResponse> BackupStart(string backend, BackupCreateRequest request)
+        {
+            if (_connection == null) throw new Exception($"Empty connection while starting backup on '{backend}'");
+            return await _connection.Client.Backups_createAsync(backend, request);
+        }
+
+        public async Task<BackupCreateStatusResponse> BackupStatus(string backend, string id)
+        {
+            if (_connection == null) throw new Exception($"Empty connection while checking backup '{id}'");
+            return await _connection.Client.Backups_create_statusAsync(backend, id);
+        }
+
+        public async Task<BackupRestoreResponse> RestoreBackup(string backend, string id, BackupRestoreRequest request)
+        {
+            if (_connection == null) throw new Exception($"Empty connection while restoring backup '{id}'");
+            return await _connection.Client.Backups_restoreAsync(backend, id, request);
+        }
+
+        public async Task<BackupRestoreStatusResponse> RestoreBackupStatus(string backend, string id)
+        {
+            if (_connection == null) throw new Exception($"Empty connection while checking backup restore '{id}'");
+            return await _connection.Client.Backups_restore_statusAsync(backend, id);
+        }
+
+        public async Task<NodesStatusResponse> CheckNodesStatus()
+        {
+            if (_connection == null) throw new Exception($"Empty connection while checking nodes status");
+            return await _connection.Client.Nodes_getAsync();
+        }
     }
 }

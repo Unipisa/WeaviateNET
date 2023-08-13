@@ -192,5 +192,28 @@ namespace WeaviateNET
                 return false;
             }
         }
+
+        public async Task<NodesStatusResponse> CheckNodesStatus()
+        {
+            if (_connection == null) throw new Exception($"Empty connection while checking nodes status for class '{this.Name}'");
+            return await _connection.Client.Nodes_get_classAsync(this.Name);
+        }
+
+        public Classification CreateClassification()
+        {
+            return new Classification() { Class = this.Name };
+        }
+
+        public async Task<Classification> StartClassification(Classification conf)
+        {
+            if (_connection == null) throw new Exception($"Empty connection while starting classification for class '{this.Name}'");
+            return await _connection.Client.Classifications_postAsync(conf);
+        }
+
+        public async Task<Classification> ClassificationsStatus(string id)
+        {
+            if (_connection == null) throw new Exception($"Empty connection while requesting classification status '{this.Name}'");
+            return await _connection.Client.Classifications_getAsync(id);
+        }
     }
 }

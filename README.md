@@ -7,26 +7,42 @@ should be generalized (they currently use a demo instance).
 It is designed to manipulate Weaviate objects and not just to adapt the
 connection to some LLM framework as other NuGet packages do.
 
+## What's new in version 1.20.5.1
+Implemented almost all endpoints, even though not all of them are tested.
+
 ## Implementation status
 The library implements almost all the schema, class, and object manipulation.
 It is possible to perform GraphQL queries though the current implementation
 is pretty raw. Thanks to Newtonsoft JObject it is possible to parse returned
 data pretty easily.
 
-Missing implementation areas (notice that you can still use the NSwag generated 
-wrapper calls):
+Note that it is still possible to use the NSwag generated API from Weaviate
+swagger file by using the *Client* property of the *WeaviateDB* connection.
+By missing APIs we intend that the calls have not yet been nicely wrapped
+in the object model and tested.
 
-- Proper references management
-- /backups/* endpoints are not implemented
+### Missing APIs
+
+- References management
 - /batch/references endpoint is not implemented
-- /classifications/* endpoints are not implemented
-- /nodes/* endpoints are not implemented
-- Tenants
+
+### Untested APIs
+
+- Tenant
+- Shards
+- Backups
+- Classifications
 
 ## Roadmap
 After implementing the missing endpoints in the object model we will work in
 providing a better GraphQL experience. In the ideal world a LINQ provider would
 be great to integrate queries into C#.
+
+## Package versioning
+The [Weaviate.NET](https://www.nuget.org/packages/WeaviateNET/) package on NuGet
+follows the versioning schema of Weaviate: version 1.20.5.1 of the package is the
+first release tested on version 1.20.5 of Weaviate. So look at the last number to
+check the library revision.
 
 ## Using the library
 

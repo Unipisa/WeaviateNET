@@ -190,6 +190,15 @@ namespace WeaviateNET.Test
             Assert.AreEqual(n, weaviateDB.Schema.Classes.Count());
         }
 
+        [TestMethod]
+        public async Task TestNodeStatus()
+        {
+            Assert.IsNotNull(weaviateDB);
+            var r = await weaviateDB.Schema.CheckNodesStatus();
+            Assert.IsNotNull(r);
+            Assert.IsTrue(r.Nodes.Count > 0);
+        }
+
         //This test require better understanding of multitenancy model
         //[TestMethod]
         //public async Task TestTenants()

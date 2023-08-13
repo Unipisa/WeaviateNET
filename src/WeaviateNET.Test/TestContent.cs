@@ -320,6 +320,15 @@ namespace WeaviateNET.Test
             Assert.AreEqual(a.Length, 5);
         }
 
+        [TestMethod]
+        public async Task TestClassNodeStatus()
+        {
+            Assert.IsNotNull(wclass);
+            var r = await wclass.CheckNodesStatus();
+            Assert.IsNotNull(r);
+            Assert.IsTrue(r.Nodes.Count > 0);
+        }
+
 
         private void assertPropertiesAreEqual(WeaviateObject<Document> data, WeaviateObject<Document> o)
         {

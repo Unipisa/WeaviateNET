@@ -7,7 +7,7 @@
         private WeaviateClient _weaviateClient;
         private Schema _schema;
 
-        internal WeaviateClient Client
+        public WeaviateClient Client
         {
             get { return _weaviateClient; }
         }
