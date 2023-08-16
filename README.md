@@ -24,6 +24,7 @@ in the object model and tested.
 ### Missing APIs
 
 - References management
+- List objects of a class (without the query)
 - /batch/references endpoint is not implemented
 
 ### Untested APIs
@@ -72,6 +73,10 @@ So we can define the class *Movie* to describe a movie document:
 
 Notice that all names follow the camel notation, *if you use pascal notation Weaviate 
 will lower case the first letter*.
+
+**Important:** If you use a class with less properties the library *will work*, this is
+useful to perform schema updates or property masking. Magic is performed by Newtonsoft
+serializer/deserializer.
 
 We can create the class in the schema and load data (of type *WeaviateObject< Movie>*):
 

@@ -23,6 +23,14 @@ namespace WeaviateNET.Test
         public int year;
     }
 
+
+    public class MovieReduced
+    {
+        public string? film;
+        public string? genre;
+        public int year;
+    }
+
     public class MovieCsvRecord
     {
         [Name("Film")]
@@ -318,6 +326,90 @@ namespace WeaviateNET.Test
             var a = data.ToObject<Movie[]>();
             Assert.IsNotNull(a);
             Assert.AreEqual(a.Length, 5);
+        }
+
+        [TestMethod]
+        public async Task TestCheckReducedObject()
+        {
+            Assert.IsNotNull(weaviateDB);
+            await weaviateDB.Schema.Update();
+            var c = weaviateDB.Schema.GetClass<MovieReduced>("MovieDBTest");
+            Assert.IsNotNull(c);
+            var o = c.Create();
+            o.Properties.film = "My test film";
+            o.Properties.film = "SciFi";
+            o.Properties.year = 2023;
+            await c.Add(o);
+            await o.Update();
+
+            var q = new GraphQLQuery();
+            q.Query = @"{
+  Get {
+    MovieDBTest(
+      limit: 5
+    )
+    {
+      film
+      genre
+      leadStudio
+      audienceScore
+      profitability
+      rottenTomatoes
+      worldWideGross
+      year
+    }
+  }
+}";
+            var ret = await weaviateDB.Schema.RawQuery(q);
+            Assert.IsNotNull(ret);
+            Assert.IsNull(ret.Errors);
+            var d = ret.Data["Get"];
+            Assert.IsNotNull(d);
+            var data = d["MovieDBTest"];
+            Assert.IsNotNull(data);
+            var a = data.ToObject<MovieReduced[]>();
+            Assert.IsNotNull(a);
+            Assert.AreEqual(a.Length, 5);
+
+            q = new GraphQLQuery();
+            q.Query = @"{
+  Get {
+    MovieDBTest
+    {
+      film
+      genre
+      leadStudio
+      audienceScore
+      profitability
+      rottenTomatoes
+      worldWideGross
+      year
+    }
+  }
+}";
+            ret = await weaviateDB.Schema.RawQuery(q);
+            Assert.IsNotNull(ret);
+            Assert.IsNull(ret.Errors);
+            d = ret.Data["Get"];
+            Assert.IsNotNull(d);
+            data = d["MovieDBTest"];
+            Assert.IsNotNull(data);
+            a = data.ToObject<MovieReduced[]>();
+            Assert.IsNotNull(a);
+            Assert.AreEqual(a.Length, 78);
+
+            await o.Delete();
+
+            ret = await weaviateDB.Schema.RawQuery(q);
+            Assert.IsNotNull(ret);
+            Assert.IsNull(ret.Errors);
+            d = ret.Data["Get"];
+            Assert.IsNotNull(d);
+            data = d["MovieDBTest"];
+            Assert.IsNotNull(data);
+            a = data.ToObject<MovieReduced[]>();
+            Assert.IsNotNull(a);
+            Assert.AreEqual(a.Length, 77);
         }
 
         [TestMethod]
