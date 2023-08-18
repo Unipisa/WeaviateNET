@@ -169,6 +169,14 @@ namespace WeaviateNET
             return ret;
         }
 
+        public async Task<ObjectsListResponse<P>> ListObjects(long limit = 25, string? after=null, long? offset=null, string? include=null, string? sort=null, string? order=null, string? tenant=null)
+        {
+            // Apparently if the parameter limit is omitted you will get 0 results (tested with curl).
+            if (_connection == null) throw new Exception($"Empty connection while listing objects of class '{this.Name}'");
+            var ret = await _connection.Client.Objects_listAsync<P>(after, offset, limit, include, sort, order, this.Name, tenant);
+            return ret;
+        }
+
         public async Task<bool> Validate(WeaviateObject<P> obj)
         {
             if (_connection == null) throw new Exception($"Empty connection while validating object '{obj.Id}'");

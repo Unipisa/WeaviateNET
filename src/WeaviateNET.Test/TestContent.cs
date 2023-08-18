@@ -369,7 +369,7 @@ namespace WeaviateNET.Test
             Assert.IsNotNull(data);
             var a = data.ToObject<MovieReduced[]>();
             Assert.IsNotNull(a);
-            Assert.AreEqual(a.Length, 5);
+            Assert.AreEqual(5, a.Length);
 
             q = new GraphQLQuery();
             q.Query = @"{
@@ -396,7 +396,7 @@ namespace WeaviateNET.Test
             Assert.IsNotNull(data);
             a = data.ToObject<MovieReduced[]>();
             Assert.IsNotNull(a);
-            Assert.AreEqual(a.Length, 78);
+            Assert.AreEqual(78, a.Length);
 
             await o.Delete();
 
@@ -409,7 +409,22 @@ namespace WeaviateNET.Test
             Assert.IsNotNull(data);
             a = data.ToObject<MovieReduced[]>();
             Assert.IsNotNull(a);
-            Assert.AreEqual(a.Length, 77);
+            Assert.AreEqual(77, a.Length);
+        }
+
+        [TestMethod]
+        public async Task TestListObjects()
+        {
+            Assert.IsNotNull(weaviateDB);
+            await weaviateDB.Schema.Update();
+            var moviedb = weaviateDB.Schema.GetClass<Movie>("MovieDBTest");
+            Assert.IsNotNull(moviedb);
+            var l = await moviedb.ListObjects(limit: 5);
+            Assert.AreEqual(5, l.TotalResults);
+            l = await moviedb.ListObjects();
+            Assert.AreEqual(25, l.TotalResults);
+            l = await moviedb.ListObjects(100);
+            Assert.AreEqual(77, l.TotalResults);
         }
 
         [TestMethod]
