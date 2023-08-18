@@ -7,7 +7,7 @@ should be generalized (they currently use a demo instance).
 It is designed to manipulate Weaviate objects and not just to adapt the
 connection to some LLM framework as other NuGet packages do.
 
-## What's new in version 1.20.5.2
+## What's new in version 1.20.5.3
 Added the ListObjects method to WeaviateClass. Apparently if you omit the *limit*
 parameter you get an empty list so the parameter is defaulted to 25.
 
