@@ -428,6 +428,16 @@ namespace WeaviateNET.Test
         }
 
         [TestMethod]
+        public async Task TestCountObjects()
+        {
+            Assert.IsNotNull(weaviateDB);
+            await weaviateDB.Schema.Update();
+            var moviedb = weaviateDB.Schema.GetClass<Movie>("MovieDBTest");
+            Assert.IsNotNull(moviedb);
+            Assert.AreEqual(77, await moviedb.CountObjects());
+        }
+
+        [TestMethod]
         public async Task TestClassNodeStatus()
         {
             Assert.IsNotNull(wclass);

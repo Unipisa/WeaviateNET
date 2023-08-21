@@ -177,6 +177,34 @@ namespace WeaviateNET
             return ret;
         }
 
+        public async Task<int> CountObjects()
+        {
+            if (_connection == null) throw new Exception($"Empty connection while counting objects of class '{this.Name}'");
+            var q = new GraphQLQuery()
+            {
+                Query = $@"{{
+  Aggregate {{
+    {this.Name} {{
+      meta {{
+        count
+      }}
+    }}
+  }}
+}}"
+            };
+            var res = await _connection.Schema.RawQuery(q);
+            if (res == null) throw new Exception("Error when performing the count query");
+            if (res.Errors == null)
+            {
+#pragma warning disable CS8602 // Disable warning for derefernce potentially null value since I know it should be ok.
+                var count = res.Data["Aggregate"][this.Name][0]["meta"].Value<int>("count");
+#pragma warning restore CS8602
+                return count;
+            }
+            throw new Exception(res.Errors.ToString());
+    }
+
+
         public async Task<bool> Validate(WeaviateObject<P> obj)
         {
             if (_connection == null) throw new Exception($"Empty connection while validating object '{obj.Id}'");
