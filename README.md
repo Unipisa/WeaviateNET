@@ -7,7 +7,7 @@ should be generalized (they currently use a demo instance).
 It is designed to manipulate Weaviate objects and not just to adapt the
 connection to some LLM framework as other NuGet packages do.
 
-## What's new in version 1.21.0.0
+## What's new in version 1.21.0.1
 Added the CountObjects method to WeaviateClass.
 
 Tested against version 1.21.0 of Weaviate
