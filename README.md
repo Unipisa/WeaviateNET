@@ -7,14 +7,9 @@ should be generalized (they currently use a demo instance).
 It is designed to manipulate Weaviate objects and not just to adapt the
 connection to some LLM framework as other NuGet packages do.
 
-## What's new in version 1.21.0.1
-Added the CountObjects method to WeaviateClass.
-
-Tested against version 1.21.0 of Weaviate
-
-### Version 1.20.5.3
-Added the ListObjects method to WeaviateClass. Apparently if you omit the *limit*
-parameter you get an empty list so the parameter is defaulted to 25.
+## What's new in version 1.21.0.2
+Added method *CountObjectsByProperty* to count object with a specific value in
+a property.
 
 ## Implementation status
 The library implements almost all the schema, class, and object manipulation.
@@ -121,3 +116,14 @@ a better abstraction will be provided.
             var ret = await weaviateDB.Schema.RawQuery(q);
             var d = ret.Data["Get"];
             var a = data.ToObject<Movie[]>();
+
+## Previous changes
+
+### Version 1.21.0.1
+Added the CountObjects method to WeaviateClass.
+
+Tested against version 1.21.0 of Weaviate
+
+### Version 1.20.5.3
+Added the ListObjects method to WeaviateClass. Apparently if you omit the *limit*
+parameter you get an empty list so the parameter is defaulted to 25.

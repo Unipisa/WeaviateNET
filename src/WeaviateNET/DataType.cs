@@ -124,6 +124,28 @@ namespace WeaviateNET
             return typename;
         }
 
+        public static string SearchValueType<T>()
+        {
+            var type = typeof(T);
+            switch (type)
+            {
+                case Type when type == typeof(string):
+                    return "valueText";
+                case Type when type == typeof(int):
+                case Type when type == typeof(long):
+                    return "valueInt";
+                case Type when type == typeof(bool):
+                    return "valueBoolean";
+                case Type when type == typeof(double):
+                    return "valueNumber";
+                case Type when type == typeof(DateTime):
+                    return "valueDate";
+                default:
+                    throw new Exception("Unsupported Query type");
+            }
+
+        }
+
         public static string MapType<T>()
         {
             return MapType(typeof(T));

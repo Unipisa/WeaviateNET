@@ -435,6 +435,8 @@ namespace WeaviateNET.Test
             var moviedb = weaviateDB.Schema.GetClass<Movie>("MovieDBTest");
             Assert.IsNotNull(moviedb);
             Assert.AreEqual(77, await moviedb.CountObjects());
+
+            Assert.AreEqual(1, await moviedb.CountObjectsByProperty("film", "WALL-E"));
         }
 
         [TestMethod]

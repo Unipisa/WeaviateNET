@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Data;
 using System.Linq;
 using System.Reflection.Metadata;
@@ -202,8 +203,40 @@ namespace WeaviateNET
                 return count;
             }
             throw new Exception(res.Errors.ToString());
-    }
+        }
 
+        public async Task<int> CountObjectsByProperty<T>(string propertyName, T value)
+        {
+            if (!typeof(P).GetFields().Where(p => p.Name == propertyName).Any())
+                throw new Exception($"'{propertyName}' is not a valid property for class '{this.Name}'");
+            if (_connection == null) throw new Exception($"Empty connection while counting objects of class '{this.Name}'");
+            var q = new GraphQLQuery()
+            {
+                Query = $@"{{
+  Aggregate {{
+    {this.Name}(where: {{
+      path: [""{propertyName}""],
+      operator: Equal,
+      {WeaviateNET.WeaviateDataType.SearchValueType<T>()}: {JsonConvert.SerializeObject(value)}
+    }}) {{
+      meta {{
+        count
+      }}
+    }}
+  }}
+}}"
+            };
+            var res = await _connection.Schema.RawQuery(q);
+            if (res == null) throw new Exception("Error when performing the count query");
+            if (res.Errors == null)
+            {
+#pragma warning disable CS8602 // Disable warning for derefernce potentially null value since I know it should be ok.
+                var count = res.Data["Aggregate"][this.Name][0]["meta"].Value<int>("count");
+#pragma warning restore CS8602
+                return count;
+            }
+            throw new Exception(res.Errors.ToString());
+        }
 
         public async Task<bool> Validate(WeaviateObject<P> obj)
         {
