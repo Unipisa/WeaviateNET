@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -27,16 +28,23 @@ namespace WeaviateNET
             }
         }
 
+        public ICollection<FieldInfo> PersistentFields<P>()
+        {
+            var flds = typeof(P).GetFields();
+            return flds.Where(f => !f.CustomAttributes.Where(a => a.AttributeType == typeof(JsonIgnoreAttribute)).Any()).ToList();
+        }
+
         public async Task<WeaviateClass<P>> NewClass<P>(string name) where P : class, new()
         {
             var c = new WeaviateClass<P>() { Name=name };
 
             if (_connection == null) throw new Exception($"Empty connection while creating class '{c.Name}'");
-            var flds = typeof(P).GetFields();
-            c.Properties = new List<Property>(flds.Length);
+            var flds = PersistentFields<P>();
+            c.Properties = new List<Property>(flds.Count);
 
-            foreach (var f in typeof(P).GetFields())
+            foreach (var f in flds)
             {
+                if (f.CustomAttributes.Where(a => a.AttributeType == typeof(JsonIgnoreAttribute)).Any()) continue;
                 // FIXME: not supporting references yet
                 c.Properties.Add(Property.Create(f.FieldType, f.Name));
             }

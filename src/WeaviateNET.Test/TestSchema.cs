@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 using System.Collections;
 using System.Text.RegularExpressions;
 using WeaviateNET;
@@ -12,6 +13,9 @@ namespace WeaviateNET.Test
     /// </summary>
     public class Document
     {
+        [JsonIgnore]
+        public Guid? id;
+
         public int intData;
         public string? textData;
         public DateTime dateData;
@@ -93,7 +97,7 @@ namespace WeaviateNET.Test
             await weaviateDB.Schema.Update();
             Assert.AreEqual(n + 1, weaviateDB.Schema.Classes.Count());
             Assert.AreEqual(c.Name, name);
-            Assert.AreEqual(c.Properties.Count, typeof(Document).GetFields().Length);
+            Assert.AreEqual(c.Properties.Count, weaviateDB.Schema.PersistentFields<Document>().Count);
             await c.Delete();
             await weaviateDB.Schema.Update();
             Assert.AreEqual(n, weaviateDB.Schema.Classes.Count());
@@ -164,7 +168,7 @@ namespace WeaviateNET.Test
             await weaviateDB.Schema.Update();
             Assert.AreEqual(n + 1, weaviateDB.Schema.Classes.Count());
             Assert.AreEqual(c.Name, name);
-            Assert.AreEqual(c.Properties.Count, typeof(Document).GetFields().Length);
+            Assert.AreEqual(c.Properties.Count, weaviateDB.Schema.PersistentFields<Document>().Count);
 
             await c.Delete();
             await weaviateDB.Schema.Update();
