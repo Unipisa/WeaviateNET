@@ -121,6 +121,13 @@ namespace WeaviateNET
             return ret;
         }
 
+        public WeaviateObject<P> Create (P data)
+        {
+            var ret = this.Create();
+            ret.Properties = data;
+            return ret;
+        }
+
         public async Task Add(WeaviateObject<P> obj, string consistency_level = "QUORUM")
         {
             if (_connection == null) throw new Exception($"Empty connection while adding object to class '{this.Name}'");

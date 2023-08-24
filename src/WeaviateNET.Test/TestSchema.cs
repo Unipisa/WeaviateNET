@@ -15,6 +15,7 @@ namespace WeaviateNET.Test
         public int intData;
         public string? textData;
         public DateTime dateData;
+        public DateTime? optionalDate;
         public string[]? textArrayData;
     }
 

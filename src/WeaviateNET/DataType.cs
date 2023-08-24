@@ -52,6 +52,7 @@ namespace WeaviateNET
                 case Type when type == typeof(double):
                 case Type when type == typeof(double[]):
                 case Type when type == typeof(DateTime):
+                case Type when type == typeof(DateTime?):
                 case Type when type == typeof(DateTime[]):
                 case Type when type == typeof(Guid):
                 case Type when type == typeof(Guid[]):
@@ -97,6 +98,7 @@ namespace WeaviateNET
                     typename = "number[]";
                     break;
                 case Type when type == typeof(DateTime):
+                case Type when type == typeof(DateTime?):
                     typename = "date";
                     break;
                 case Type when type == typeof(DateTime[]):
@@ -139,6 +141,7 @@ namespace WeaviateNET
                 case Type when type == typeof(double):
                     return "valueNumber";
                 case Type when type == typeof(DateTime):
+                case Type when type == typeof(DateTime?):
                     return "valueDate";
                 default:
                     throw new Exception("Unsupported Query type");

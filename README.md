@@ -7,9 +7,9 @@ should be generalized (they currently use a demo instance).
 It is designed to manipulate Weaviate objects and not just to adapt the
 connection to some LLM framework as other NuGet packages do.
 
-## What's new in version 1.21.0.2
-Added method *CountObjectsByProperty* to count object with a specific value in
-a property.
+## What's new in version 1.21.1.1
+Now the *DateTime?* type is supported. The library will convert the DateTime? to
+*DatTime*.
 
 ## Implementation status
 The library implements almost all the schema, class, and object manipulation.
@@ -118,6 +118,10 @@ a better abstraction will be provided.
             var a = data.ToObject<Movie[]>();
 
 ## Previous changes
+
+### version 1.21.0.2
+Added method *CountObjectsByProperty* to count object with a specific value in
+a property.
 
 ### Version 1.21.0.1
 Added the CountObjects method to WeaviateClass.
