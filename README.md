@@ -7,9 +7,9 @@ should be generalized (they currently use a demo instance).
 It is designed to manipulate Weaviate objects and not just to adapt the
 connection to some LLM framework as other NuGet packages do.
 
-## What's new in version 1.21.1.1
-Now the *DateTime?* type is supported. The library will convert the DateTime? to
-*DatTime*.
+## What's new in version 1.21.1.2
+- Now it is possible to define fields in classes that are not mapped to Weaviate
+properties if annotated with JsonIgnore attribute.
 
 ## Implementation status
 The library implements almost all the schema, class, and object manipulation.
@@ -74,6 +74,12 @@ So we can define the class *Movie* to describe a movie document:
 Notice that all names follow the camel notation, *if you use pascal notation Weaviate 
 will lower case the first letter*.
 
+If we want to expose the id field in the *Movie* class we can use the *JsonIgnore* attribute
+to avoid mapping it to a property:
+
+        [JsonIgnore]
+        public Guid? id;
+
 **Important:** If you use a class with less properties the library *will work*, this is
 useful to perform schema updates or property masking. Magic is performed by Newtonsoft
 serializer/deserializer.
@@ -118,6 +124,10 @@ a better abstraction will be provided.
             var a = data.ToObject<Movie[]>();
 
 ## Previous changes
+
+### version 1.21.1.1
+Now the *DateTime?* type is supported. The library will convert the DateTime? to
+*DatTime*.
 
 ### version 1.21.0.2
 Added method *CountObjectsByProperty* to count object with a specific value in
