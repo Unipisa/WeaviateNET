@@ -7,11 +7,13 @@ should be generalized (they currently use a demo instance).
 It is designed to manipulate Weaviate objects and not just to adapt the
 connection to some LLM framework as other NuGet packages do.
 
-## What's new in version 1.21.1.3
-- Added attributes *VectorIndexConfig*, *ReplicationConfig*, *IndexStopwords*,
+## What's new in version 1.21.1.{3,4}
+- (v4) Fixed a bug in the *WeaviateClass* in *Get* and *ListObjects* methods that
+  failed to inject the class reference into returned objects.
+- V(3) Added attributes *VectorIndexConfig*, *ReplicationConfig*, *IndexStopwords*,
   *IndexTimestamps*, *IndexNullState*, *IndexPropertyLength*, *BM25Index*,
   *MultiTenancy* to decorate class definition and control indexing options.
-- Added attributes *Tokenization*, *IndexFilterable*, *IndexSearchable* to
+- v(3) Added attributes *Tokenization*, *IndexFilterable*, *IndexSearchable* to
   decorate class fields and control indexing options.
 
 ## Implementation status

@@ -17,7 +17,7 @@
     <PackageId>$(AssemblyName)</PackageId>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <Configurations>Debug;Release;Release 6.0;Debug 6.0</Configurations>
-    <Version>1.21.1.3</Version>
+    <Version>1.21.1.4</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

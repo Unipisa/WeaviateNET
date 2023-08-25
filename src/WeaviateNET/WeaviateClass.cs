@@ -170,10 +170,12 @@ namespace WeaviateNET
             return await _connection.Client.Batch_objects_deleteAsync(q, consistency_level, tenant);
         }
 
-        public async Task<WeaviateObject<P>> Get(Guid id, string consistency_level = "QUORUM", string? include = null, string? node_name = null, string? tenant = null)
+        public async Task<WeaviateObject<P>?> Get(Guid id, string consistency_level = "QUORUM", string? include = null, string? node_name = null, string? tenant = null)
         {
             if (_connection == null) throw new Exception($"Empty connection while fetching object '{id}'");
             var ret = await _connection.Client.Objects_class_getAsync<P>(this.Name, id, include, consistency_level, node_name, tenant);
+            if (ret != null)
+                ret.classType = this;
             return ret;
         }
 
@@ -182,6 +184,10 @@ namespace WeaviateNET
             // Apparently if the parameter limit is omitted you will get 0 results (tested with curl).
             if (_connection == null) throw new Exception($"Empty connection while listing objects of class '{this.Name}'");
             var ret = await _connection.Client.Objects_listAsync<P>(after, offset, limit, include, sort, order, this.Name, tenant);
+            foreach (var o in ret.Objects)
+            {
+                o.classType = this;
+            }
             return ret;
         }
 
