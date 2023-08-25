@@ -36,17 +36,63 @@ namespace WeaviateNET
 
         public async Task<WeaviateClass<P>> NewClass<P>(string name) where P : class, new()
         {
+            if (_connection == null) throw new Exception($"Empty connection while creating class '{name}'");
+
             var c = new WeaviateClass<P>() { Name=name };
 
-            if (_connection == null) throw new Exception($"Empty connection while creating class '{c.Name}'");
+            var pclass = typeof(P);
+
+            var vectorIndexConfig = pclass.GetCustomAttribute<VectorIndexConfigAttribute>();
+            if (vectorIndexConfig != null) c.VectorIndexConfig = new Dictionary<string, object>(){ { "distance", vectorIndexConfig.Distance } };
+            var replicationConfig = pclass.GetCustomAttribute<ReplicationConfigAttribute>();
+            if (replicationConfig != null) c.ReplicationConfig.Factor = replicationConfig.Factor;
+            var indexStopwords = pclass.GetCustomAttribute<IndexStopwordsAttribute>();
+            var indexTimestamps = pclass.GetCustomAttribute<IndexTimestampsAttribute>();
+            var indexNullState = pclass.GetCustomAttribute<IndexNullStateAttribute>();
+            var indexPropertyLength = pclass.GetCustomAttribute<IndexPropertyLengthAttribute>();
+            var bm25indexConfig = pclass.GetCustomAttribute<BM25IndexAttribute>();
+            if (c.InvertedIndexConfig == null && 
+                (indexStopwords != null || 
+                indexTimestamps != null || 
+                indexNullState != null || 
+                indexPropertyLength != null || 
+                bm25indexConfig != null))
+                c.InvertedIndexConfig = new InvertedIndexConfig();
+            if (indexStopwords != null)
+            {
+                if (c.InvertedIndexConfig.Stopwords == null)
+                    c.InvertedIndexConfig.Stopwords = new StopwordConfig();
+                c.InvertedIndexConfig.Stopwords.Preset = indexStopwords.Preset;
+                c.InvertedIndexConfig.Stopwords.Additions = indexStopwords.Additions;
+                c.InvertedIndexConfig.Stopwords.Removals = indexStopwords.Removals;
+            }
+            if (indexTimestamps != null) c.InvertedIndexConfig.IndexTimestamps = indexTimestamps.Enabled;
+            if (indexNullState != null) c.InvertedIndexConfig.IndexNullState = indexNullState.Enabled;
+            if (indexPropertyLength != null) c.InvertedIndexConfig.IndexPropertyLength = indexPropertyLength.Enabled;
+            if (bm25indexConfig != null)
+            {
+                if (c.InvertedIndexConfig.Bm25 == null)
+                    c.InvertedIndexConfig.Bm25 = new BM25Config();
+                c.InvertedIndexConfig.Bm25.K1 = bm25indexConfig.K1;
+                c.InvertedIndexConfig.Bm25.B = bm25indexConfig.B;
+            }
+            var multiTenancyConfig = pclass.GetCustomAttribute<MultiTenancyAttribute>();
+            if (multiTenancyConfig != null) c.MultiTenancyConfig.Enabled = multiTenancyConfig.Enabled;
+
             var flds = PersistentFields<P>();
             c.Properties = new List<Property>(flds.Count);
 
             foreach (var f in flds)
             {
-                if (f.CustomAttributes.Where(a => a.AttributeType == typeof(JsonIgnoreAttribute)).Any()) continue;
+                var p = Property.Create(f.FieldType, f.Name);
+                var tokenizationModeConfig = f.GetCustomAttribute<TokenizationAttribute>();
+                if (tokenizationModeConfig != null) p.Tokenization = tokenizationModeConfig.Mode;
+                var indexFilterableConfig = f.GetCustomAttribute<IndexFilterableAttribute>();
+                if (indexFilterableConfig != null) p.IndexFilterable = indexFilterableConfig.Enabled;
+                var indexSearchableConfig = f.GetCustomAttribute<IndexSearchableAttribute>();
+                if (indexSearchableConfig != null) p.IndexSearchable = indexSearchableConfig.Enabled;
                 // FIXME: not supporting references yet
-                c.Properties.Add(Property.Create(f.FieldType, f.Name));
+                c.Properties.Add(p);
             }
             var nc = await _connection.Client.Schema_objects_createAsync(c);
             

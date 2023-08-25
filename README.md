@@ -7,9 +7,12 @@ should be generalized (they currently use a demo instance).
 It is designed to manipulate Weaviate objects and not just to adapt the
 connection to some LLM framework as other NuGet packages do.
 
-## What's new in version 1.21.1.2
-- Now it is possible to define fields in classes that are not mapped to Weaviate
-properties if annotated with JsonIgnore attribute.
+## What's new in version 1.21.1.3
+- Added attributes *VectorIndexConfig*, *ReplicationConfig*, *IndexStopwords*,
+  *IndexTimestamps*, *IndexNullState*, *IndexPropertyLength*, *BM25Index*,
+  *MultiTenancy* to decorate class definition and control indexing options.
+- Added attributes *Tokenization*, *IndexFilterable*, *IndexSearchable* to
+  decorate class fields and control indexing options.
 
 ## Implementation status
 The library implements almost all the schema, class, and object manipulation.
@@ -59,6 +62,7 @@ with the appropriate data type (see *WeaviateDataType* class for the full list).
 *Weaviate.NET* maps properties to class fields (with few restrictions of course).
 So we can define the class *Movie* to describe a movie document:
 
+    [IndexNullState] // annotation to configure indexing options
     public class Movie
     {
         public string? film;
@@ -124,6 +128,10 @@ a better abstraction will be provided.
             var a = data.ToObject<Movie[]>();
 
 ## Previous changes
+
+### version 1.21.1.2
+- Now it is possible to define fields in classes that are not mapped to Weaviate
+properties if annotated with JsonIgnore attribute.
 
 ### version 1.21.1.1
 Now the *DateTime?* type is supported. The library will convert the DateTime? to

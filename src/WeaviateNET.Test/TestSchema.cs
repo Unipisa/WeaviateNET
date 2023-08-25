@@ -11,6 +11,7 @@ namespace WeaviateNET.Test
     /// public fields with low case names (otherwise serialization/deserialization may fail).
     /// Weaviate corrects property names into lower case.
     /// </summary>
+    [VectorIndexConfig(Distance = DistanceMetric.Dot), IndexNullState]
     public class Document
     {
         [JsonIgnore]
@@ -20,6 +21,7 @@ namespace WeaviateNET.Test
         public string? textData;
         public DateTime dateData;
         public DateTime? optionalDate;
+        [Tokenization(PropertyTokenization.Whitespace)]
         public string[]? textArrayData;
     }
 
