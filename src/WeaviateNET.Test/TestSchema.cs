@@ -99,7 +99,7 @@ namespace WeaviateNET.Test
             await weaviateDB.Schema.Update();
             Assert.AreEqual(n + 1, weaviateDB.Schema.Classes.Count());
             Assert.AreEqual(c.Name, name);
-            Assert.AreEqual(c.Properties.Count, weaviateDB.Schema.PersistentFields<Document>().Count);
+            Assert.AreEqual(c.Properties.Count, Schema.PersistentFields<Document>().Count);
             await c.Delete();
             await weaviateDB.Schema.Update();
             Assert.AreEqual(n, weaviateDB.Schema.Classes.Count());
@@ -170,7 +170,7 @@ namespace WeaviateNET.Test
             await weaviateDB.Schema.Update();
             Assert.AreEqual(n + 1, weaviateDB.Schema.Classes.Count());
             Assert.AreEqual(c.Name, name);
-            Assert.AreEqual(c.Properties.Count, weaviateDB.Schema.PersistentFields<Document>().Count);
+            Assert.AreEqual(c.Properties.Count, Schema.PersistentFields<Document>().Count);
 
             await c.Delete();
             await weaviateDB.Schema.Update();

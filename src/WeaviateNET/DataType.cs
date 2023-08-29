@@ -132,6 +132,7 @@ namespace WeaviateNET
             switch (type)
             {
                 case Type when type == typeof(string):
+                case Type when type == typeof(string[]):
                     return "valueText";
                 case Type when type == typeof(int):
                 case Type when type == typeof(long):

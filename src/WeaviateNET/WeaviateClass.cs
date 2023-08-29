@@ -8,6 +8,8 @@ using System.Reflection.Metadata;
 using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Threading.Tasks;
+using WeaviateNET.Query.AdditionalOperator;
+using WeaviateNET.Query.ConditionalOperator;
 
 namespace WeaviateNET
 {
@@ -191,20 +193,16 @@ namespace WeaviateNET
             return ret;
         }
 
+        public Query.Get<P> CreateGetQuery(bool selectall=true) => new Query.Get<P>(this, selectall);
+        public Query.Aggregate<P> CreateAggregateQuery() => new Query.Aggregate<P>(this);
+
         public async Task<int> CountObjects()
         {
             if (_connection == null) throw new Exception($"Empty connection while counting objects of class '{this.Name}'");
+            ;
             var q = new GraphQLQuery()
             {
-                Query = $@"{{
-  Aggregate {{
-    {this.Name} {{
-      meta {{
-        count
-      }}
-    }}
-  }}
-}}"
+                Query = CreateAggregateQuery().Meta().ToString()
             };
             var res = await _connection.Schema.RawQuery(q);
             if (res == null) throw new Exception("Error when performing the count query");
@@ -223,21 +221,12 @@ namespace WeaviateNET
             if (!typeof(P).GetFields().Where(p => p.Name == propertyName).Any())
                 throw new Exception($"'{propertyName}' is not a valid property for class '{this.Name}'");
             if (_connection == null) throw new Exception($"Empty connection while counting objects of class '{this.Name}'");
+            var aq = CreateAggregateQuery();
+            aq.Filter.Where(When<P,T>.Equal(propertyName, value));
+            aq.Meta();
             var q = new GraphQLQuery()
             {
-                Query = $@"{{
-  Aggregate {{
-    {this.Name}(where: {{
-      path: [""{propertyName}""],
-      operator: Equal,
-      {WeaviateNET.WeaviateDataType.SearchValueType<T>()}: {JsonConvert.SerializeObject(value)}
-    }}) {{
-      meta {{
-        count
-      }}
-    }}
-  }}
-}}"
+                Query = aq.ToString()
             };
             var res = await _connection.Schema.RawQuery(q);
             if (res == null) throw new Exception("Error when performing the count query");

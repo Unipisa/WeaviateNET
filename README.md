@@ -4,17 +4,20 @@ for .NET core. The core API has been wrapped with *NSwagStudio* and then some
 extra layer has been added. The API mapping is incomplete and Unit tests
 should be generalized (they currently use a demo instance).
 
+A great attention has been paid to the type system so that many errors will
+be detected at compile time.
+
 It is designed to manipulate Weaviate objects and not just to adapt the
 connection to some LLM framework as other NuGet packages do.
 
-## What's new in version 1.21.1.{3,4}
-- (v4) Fixed a bug in the *WeaviateClass* in *Get* and *ListObjects* methods that
-  failed to inject the class reference into returned objects.
-- V(3) Added attributes *VectorIndexConfig*, *ReplicationConfig*, *IndexStopwords*,
-  *IndexTimestamps*, *IndexNullState*, *IndexPropertyLength*, *BM25Index*,
-  *MultiTenancy* to decorate class definition and control indexing options.
-- v(3) Added attributes *Tokenization*, *IndexFilterable*, *IndexSearchable* to
-  decorate class fields and control indexing options.
+
+## What's new in version 1.21.1.5
+**important**: This is a major release with significant improvements in the query
+support.
+
+- Implemented type safe GraphQL Generator for Get and Aggregate queries: now
+  it is possible to write queries in a more concise way. See the example below.
+  Results are still to be parsed using JQuery.
 
 ## Implementation status
 The library implements almost all the schema, class, and object manipulation.
@@ -31,6 +34,8 @@ in the object model and tested.
 
 - References management
 - /batch/references endpoint is not implemented
+- Explore query generator
+- Parser of query results
 
 ### Untested APIs
 
@@ -102,9 +107,22 @@ We can create the class in the schema and load data (of type *WeaviateObject< Mo
     }
     await mc.Add(toadd);
 
-To query the database you use explicitly the GraphQL syntax and the ability of JObject
-to deserialize a field. This basic approach will be supported in the future but 
-a better abstraction will be provided.
+To query the database you can use a query generator which allows you to compose a query
+from typed constituents. The generator allows you to generate the query text. This is
+an evolution of the library though it is not yet the final versione of query support.
+
+            var qg = mc.CreateGetQuery(selectall: true);
+            mc.Filter
+              .Limit(5)
+              .NearText("robot in the future");
+            var q = new GraphQLQuery();
+            q.Query = qg.ToString();
+            var ret = await weaviateDB.Schema.RawQuery(q);
+            var d = ret.Data["Get"];
+            var a = data.ToObject<Movie[]>();
+
+In any case you can use explicitly the GraphQL syntax and the ability of JObject
+to deserialize a field.
 
             var q = new GraphQLQuery();
             q.Query = @"{
@@ -130,6 +148,15 @@ a better abstraction will be provided.
             var a = data.ToObject<Movie[]>();
 
 ## Previous changes
+
+### version 1.21.1.{3,4}
+- (v4) Fixed a bug in the *WeaviateClass* in *Get* and *ListObjects* methods that
+  failed to inject the class reference into returned objects.
+- V(3) Added attributes *VectorIndexConfig*, *ReplicationConfig*, *IndexStopwords*,
+  *IndexTimestamps*, *IndexNullState*, *IndexPropertyLength*, *BM25Index*,
+  *MultiTenancy* to decorate class definition and control indexing options.
+- v(3) Added attributes *Tokenization*, *IndexFilterable*, *IndexSearchable* to
+  decorate class fields and control indexing options.
 
 ### version 1.21.1.2
 - Now it is possible to define fields in classes that are not mapped to Weaviate

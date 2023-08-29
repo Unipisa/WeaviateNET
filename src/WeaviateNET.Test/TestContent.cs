@@ -13,6 +13,7 @@ namespace WeaviateNET.Test
 {
     public class Movie
     {
+        public const string ClassName = "MovieDBTest";
         public string? film;
         public string? genre;
         public string? leadStudio;

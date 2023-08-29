@@ -28,10 +28,15 @@ namespace WeaviateNET
             }
         }
 
-        public ICollection<FieldInfo> PersistentFields<P>()
+        public static ICollection<FieldInfo> PersistentFields<P>()
         {
             var flds = typeof(P).GetFields();
             return flds.Where(f => !f.CustomAttributes.Where(a => a.AttributeType == typeof(JsonIgnoreAttribute)).Any()).ToList();
+        }
+
+        public static ICollection<string> PersistentFieldNames<P>()
+        {
+            return PersistentFields<P>().Select(f => f.Name).ToList();
         }
 
         public async Task<WeaviateClass<P>> NewClass<P>(string name) where P : class, new()
@@ -60,18 +65,18 @@ namespace WeaviateNET
                 c.InvertedIndexConfig = new InvertedIndexConfig();
             if (indexStopwords != null)
             {
-                if (c.InvertedIndexConfig.Stopwords == null)
+                if (c.InvertedIndexConfig!.Stopwords == null)
                     c.InvertedIndexConfig.Stopwords = new StopwordConfig();
                 c.InvertedIndexConfig.Stopwords.Preset = indexStopwords.Preset;
                 c.InvertedIndexConfig.Stopwords.Additions = indexStopwords.Additions;
                 c.InvertedIndexConfig.Stopwords.Removals = indexStopwords.Removals;
             }
-            if (indexTimestamps != null) c.InvertedIndexConfig.IndexTimestamps = indexTimestamps.Enabled;
-            if (indexNullState != null) c.InvertedIndexConfig.IndexNullState = indexNullState.Enabled;
-            if (indexPropertyLength != null) c.InvertedIndexConfig.IndexPropertyLength = indexPropertyLength.Enabled;
+            if (indexTimestamps != null) c.InvertedIndexConfig!.IndexTimestamps = indexTimestamps.Enabled;
+            if (indexNullState != null) c.InvertedIndexConfig!.IndexNullState = indexNullState.Enabled;
+            if (indexPropertyLength != null) c.InvertedIndexConfig!.IndexPropertyLength = indexPropertyLength.Enabled;
             if (bm25indexConfig != null)
             {
-                if (c.InvertedIndexConfig.Bm25 == null)
+                if (c.InvertedIndexConfig!.Bm25 == null)
                     c.InvertedIndexConfig.Bm25 = new BM25Config();
                 c.InvertedIndexConfig.Bm25.K1 = bm25indexConfig.K1;
                 c.InvertedIndexConfig.Bm25.B = bm25indexConfig.B;

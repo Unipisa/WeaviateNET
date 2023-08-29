@@ -6,6 +6,30 @@ using System.Threading.Tasks;
 
 namespace WeaviateNET
 {
+    [AttributeUsage(AttributeTargets.Class)]
+    public class GetOperatorAttribute : Attribute
+    {
+        public GetOperatorAttribute()
+        {
+        }
+    }
+
+    [AttributeUsage(AttributeTargets.Class)]
+    public class AggregateOperatorAttribute : Attribute
+    {
+        public AggregateOperatorAttribute()
+        {
+        }
+    }
+
+    [AttributeUsage(AttributeTargets.Class)]
+    public class ExploreOperatorAttribute : Attribute
+    {
+        public ExploreOperatorAttribute()
+        {
+        }
+    }
+
     public static class DistanceMetric
     {
         public const string Cosine = "cosine";
