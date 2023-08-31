@@ -98,7 +98,7 @@ namespace WeaviateNET.Query.ConditionalOperator
             AppendLineStartBlock("{", indent: StartWithIndent);
             AppendLine($"operator: {Operator},");
             AppendLine($"path: {JsonConvert.SerializeObject(Path)},");
-            AppendLine($"{WeaviateDataType.SearchValueType<V>()}: {JsonConvert.SerializeObject(Value)},");
+            AppendLine($"{WeaviateDataType.SearchValueType<V>()}: {JsonConvert.SerializeObject(Value)}");
             if (EndWithLineBreak)
                 AppendLineEndBlock("}");
             else
