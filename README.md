@@ -19,6 +19,36 @@ support.
   it is possible to write queries in a more concise way. See the example below.
   Results are still to be parsed using JQuery.
 
+## PowerShell support
+The library is now available through PowerShell cmdlets though the usage requires
+some level of understanding of the Newtonsoft.Json library and in particular
+how to access JObject values from PowerShell. However, sometimes is useful to
+access the object model from PowerShell. Over time access to generic methods
+will be supported, for the moment the module is really an experimental feature.
+
+The module is available from PowerShell Gallery and can be installed with:
+
+	Install-Module PSWeaviateNET
+
+To configure the module:
+
+    Import-Module PSWeaviateNET
+
+    $conf = new-object PSWeaviateNET.WeaviateConfiguration
+    $conf.WeaviateEndpoint = "https://yourWeaviateUrl/v1"
+    $conf.$conf.WeaviateApiKey = "Your key if needed"
+
+    ConvertTo-Json $conf > weaviate.conf
+
+To use the module:
+
+    Import-Module PSWeaviateNET
+
+    Connect-Weaviate -ConfigurationFile weaviate.conf
+    Find-WeaviateObjects -Query "{ Get { MovieDBTest { film genre } } }"
+    $s = Get-Schema
+    $s.Classes
+
 ## Implementation status
 The library implements almost all the schema, class, and object manipulation.
 It is possible to perform GraphQL queries though the current implementation
