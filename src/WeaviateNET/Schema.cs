@@ -89,7 +89,21 @@ namespace WeaviateNET
 
             foreach (var f in flds)
             {
-                var p = Property.Create(f.FieldType, f.Name);
+                Property? p = null;
+                if (f.FieldType == typeof(WeaviateRef) || f.FieldType == typeof(WeaviateRef[]))
+                {
+                    var a = f.GetCustomAttribute<BeaconToAttribute>();
+                    if (a == null)
+                        throw new Exception("Custom attribute 'BeaconTo' is required for 'WeaviateRef' fields");
+                    if (a.ClassNames == null || a.ClassNames.Length == 0)
+                        throw new Exception("Custom attribute 'BeaconTo' must have at least one class name specified");
+                    p = Property.CreateRef(f.Name, a.ClassNames);
+                }
+                else
+                {
+                    p = Property.Create(f.FieldType, f.Name);
+                }
+                    
                 var tokenizationModeConfig = f.GetCustomAttribute<TokenizationAttribute>();
                 if (tokenizationModeConfig != null) p.Tokenization = tokenizationModeConfig.Mode;
                 var indexFilterableConfig = f.GetCustomAttribute<IndexFilterableAttribute>();

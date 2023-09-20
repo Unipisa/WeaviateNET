@@ -23,6 +23,10 @@ namespace WeaviateNET.Test
         public DateTime? optionalDate;
         [Tokenization(PropertyTokenization.Whitespace)]
         public string[]? textArrayData;
+        [BeaconTo("MovieDBTest")]
+        public WeaviateRef? singleMovieRef;
+        [BeaconTo("MovieDBTest")]
+        public WeaviateRef[]? multipleMovieRef;
     }
 
     [TestClass]

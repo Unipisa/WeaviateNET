@@ -11,9 +11,9 @@ It is designed to manipulate Weaviate objects and not just to adapt the
 connection to some LLM framework as other NuGet packages do.
 
 
-## What's new in version 1.21.2.1
+## What's new in version 1.21.3.1
 
-- This is just a validation on version 1.21.2 of Weaviate.
+- Added support for WeaviateRef type, but it is still in alpha.
 
 ### Version 1.21.1.5
 **important**: This is a major release with significant improvements in the query

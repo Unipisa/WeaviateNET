@@ -6,6 +6,17 @@ using System.Threading.Tasks;
 
 namespace WeaviateNET
 {
+    [AttributeUsage(AttributeTargets.Field)]
+    public class BeaconToAttribute : Attribute
+    {
+        public string[] ClassNames { get; set; }
+
+        public BeaconToAttribute(params string[] className)
+        {
+            this.ClassNames = className;
+        }
+    }
+
     [AttributeUsage(AttributeTargets.Class)]
     public class GetOperatorAttribute : Attribute
     {
