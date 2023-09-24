@@ -183,32 +183,4 @@ to deserialize a field.
 
 ## Previous changes
 
-### version 1.21.1.{3,4}
-- (v4) Fixed a bug in the *WeaviateClass* in *Get* and *ListObjects* methods that
-  failed to inject the class reference into returned objects.
-- V(3) Added attributes *VectorIndexConfig*, *ReplicationConfig*, *IndexStopwords*,
-  *IndexTimestamps*, *IndexNullState*, *IndexPropertyLength*, *BM25Index*,
-  *MultiTenancy* to decorate class definition and control indexing options.
-- v(3) Added attributes *Tokenization*, *IndexFilterable*, *IndexSearchable* to
-  decorate class fields and control indexing options.
-
-### version 1.21.1.2
-- Now it is possible to define fields in classes that are not mapped to Weaviate
-properties if annotated with JsonIgnore attribute.
-
-### version 1.21.1.1
-Now the *DateTime?* type is supported. The library will convert the DateTime? to
-*DatTime*.
-
-### version 1.21.0.2
-Added method *CountObjectsByProperty* to count object with a specific value in
-a property.
-
-### Version 1.21.0.1
-Added the CountObjects method to WeaviateClass.
-
-Tested against version 1.21.0 of Weaviate
-
-### Version 1.20.5.3
-Added the ListObjects method to WeaviateClass. Apparently if you omit the *limit*
-parameter you get an empty list so the parameter is defaulted to 25.
+Available in the [Wiki documentation](https://github.com/Unipisa/WeaviateNET/wiki/Changes-history)
