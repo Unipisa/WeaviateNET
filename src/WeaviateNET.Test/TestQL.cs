@@ -45,6 +45,21 @@ namespace WeaviateNET.Test
         }
 
         [TestMethod]
+        public async Task TestSimpleGetOnTypes()
+        {
+            Assert.IsNotNull(weaviateDB);
+            var name = $"Test{DateTime.Now.Ticks}";
+            var facts = await weaviateDB.Schema.NewClass<Fact>(name);
+            var q = facts.CreateGetQuery(true);
+            var query = new GraphQLQuery();
+            query.Query = q.ToString();
+            var ret = await weaviateDB.Schema.RawQuery(query);
+            await facts.Delete();
+            Assert.IsNotNull(ret);
+            Assert.IsNull(ret.Errors);
+        }
+
+        [TestMethod]
         public async Task TestGetSearchOps1()
         {
             Assert.IsNotNull(weaviateDB);

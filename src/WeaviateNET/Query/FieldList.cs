@@ -82,7 +82,17 @@ namespace WeaviateNET.Query
                 throw new Exception("No fields selected");
             foreach (var f in _fields)
             {
-                AppendLine(f);
+                var t = typeof(P).GetField(f)!.FieldType;
+                if (t == typeof(GeoCoordinates))
+                {
+                    AppendLineStartBlock($"{f} {{");
+                    AppendLine("latitude");
+                    AppendLine("longitude");
+                    AppendLineEndBlock("}");
+                } else
+                {
+                    AppendLine(f);
+                }
             }
             _additional.Render(Output!, IndentationLevel);
         }
