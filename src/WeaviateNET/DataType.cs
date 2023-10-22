@@ -78,7 +78,9 @@ namespace WeaviateNET
                     typename = "text[]";
                     break;
                 case Type when type == typeof(int):
+                case Type when type == typeof(int?):
                 case Type when type == typeof(long):
+                case Type when type == typeof(long?):
                     typename = "int";
                     break;
                 case Type when type == typeof(int[]):
@@ -92,6 +94,7 @@ namespace WeaviateNET
                     typename = "boolean[]";
                     break;
                 case Type when type == typeof(double):
+                case Type when type == typeof(double?):
                     typename = "number";
                     break;
                 case Type when type == typeof(double[]):

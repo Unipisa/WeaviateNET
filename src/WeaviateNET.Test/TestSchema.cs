@@ -6,6 +6,38 @@ using WeaviateNET;
 
 namespace WeaviateNET.Test
 {
+    public class Fact
+    {
+        internal const int MajorVersion = 1;
+        internal const int MinorVersion = 1;
+
+        [JsonIgnore]
+        public const string ClassName = "Facts";
+
+        [JsonIgnore]
+        public Guid? id;
+        [JsonIgnore]
+        public double? distance;
+
+        public string? factType;
+        public string? category;
+        public string[]? tags;
+        public string? title;
+        public string? content;
+        public string? citation;
+        public string? reference;
+        public DateTime? expiration;
+        public GeoCoordinates? location;
+        public double? locationDistance;
+        public string? locationName;
+        public string[]? editPrincipals;
+        public string? validFrom;
+        public string? validTo;
+        //public WeaviateRef[]? references;
+        public DateTime? factAdded;
+    }
+
+
     /// <summary>
     /// Example of property definition. Notice that you *should* use only
     /// public fields with low case names (otherwise serialization/deserialization may fail).
@@ -84,6 +116,22 @@ namespace WeaviateNET.Test
             await weaviateDB.Schema.Update();
             var n = weaviateDB.Schema.Classes.Count();
             var c = await weaviateDB.Schema.NewClass<NoProperties>(name);
+            await weaviateDB.Schema.Update();
+            Assert.AreEqual(n + 1, weaviateDB.Schema.Classes.Count());
+            Assert.AreEqual(c.Name, name);
+            await c.Delete();
+            await weaviateDB.Schema.Update();
+            Assert.AreEqual(n, weaviateDB.Schema.Classes.Count());
+        }
+
+        [TestMethod]
+        public async Task TestCreateFactClass()
+        {
+            Assert.IsNotNull(weaviateDB);
+            var name = $"Test{DateTime.Now.Ticks}";
+            await weaviateDB.Schema.Update();
+            var n = weaviateDB.Schema.Classes.Count();
+            var c = await weaviateDB.Schema.NewClass<Fact>(name);
             await weaviateDB.Schema.Update();
             Assert.AreEqual(n + 1, weaviateDB.Schema.Classes.Count());
             Assert.AreEqual(c.Name, name);
