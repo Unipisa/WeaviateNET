@@ -10,10 +10,11 @@ be detected at compile time.
 It is designed to manipulate Weaviate objects and not just to adapt the
 connection to some LLM framework as other NuGet packages do.
 
-## What's new in version 1.21.6.1
+## What's new in version 1.21.6.2
 
 - Added support for WeaviateRef type, but it is still in alpha.
 - Fixed a bug when using nullable value types in the schema.
+- Fixed a bug in the query generator for GeoCoordinates type.
 
 ### Version 1.21.1.5
 **important**: This is a major release with significant improvements in the query
