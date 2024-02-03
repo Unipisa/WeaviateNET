@@ -129,13 +129,13 @@ namespace WeaviateNET.Test
 
             weaviateDB = new WeaviateDB(Configuration["Weaviate:ServiceEndpoint"], Configuration["Weaviate:ApiKey"]);
 
+            var dbj = PopulateMovieDB();
+            dbj.Wait();
+
             var j = CreateClass<Document>();
             j.Wait();
             wclass = j.Result;
             dataValue = DateTime.Now;
-
-            var dbj = PopulateMovieDB();
-            dbj.Wait();
         }
 
         [TestCleanup]
@@ -195,7 +195,7 @@ namespace WeaviateNET.Test
                 Assert.IsNotNull(o);
                 Assert.IsNotNull(o.Id);
                 var d = await wclass.Get((Guid)o.Id);
-                assertPropertiesAreEqual(o, d);
+                assertPropertiesAreEqual(o, d!);
             }
         }
 
@@ -420,6 +420,8 @@ namespace WeaviateNET.Test
             await weaviateDB.Schema.Update();
             var moviedb = weaviateDB.Schema.GetClass<Movie>("MovieDBTest");
             Assert.IsNotNull(moviedb);
+            var num = await moviedb.CountObjects();
+            Assert.AreEqual(77, num);
             var l = await moviedb.ListObjects(limit: 5);
             Assert.AreEqual(5, l.TotalResults);
             l = await moviedb.ListObjects();
