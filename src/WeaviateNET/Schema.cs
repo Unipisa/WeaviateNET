@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using WeaviateNET.Modules;
 
 namespace WeaviateNET
 {
@@ -47,6 +48,7 @@ namespace WeaviateNET
 
             var pclass = typeof(P);
 
+            var vectorizer = pclass.GetCustomAttribute<VectorizerAttribute>();
             var vectorIndexConfig = pclass.GetCustomAttribute<VectorIndexConfigAttribute>();
             if (vectorIndexConfig != null) c.VectorIndexConfig = new Dictionary<string, object>(){ { "distance", vectorIndexConfig.Distance } };
             var replicationConfig = pclass.GetCustomAttribute<ReplicationConfigAttribute>();
@@ -56,6 +58,10 @@ namespace WeaviateNET
             var indexNullState = pclass.GetCustomAttribute<IndexNullStateAttribute>();
             var indexPropertyLength = pclass.GetCustomAttribute<IndexPropertyLengthAttribute>();
             var bm25indexConfig = pclass.GetCustomAttribute<BM25IndexAttribute>();
+            if (vectorizer != null)
+            {
+                ConfigureClassModulueOptions(c, vectorizer);
+            }
             if (c.InvertedIndexConfig == null && 
                 (indexStopwords != null || 
                 indexTimestamps != null || 
@@ -110,6 +116,8 @@ namespace WeaviateNET
                 if (indexFilterableConfig != null) p.IndexFilterable = indexFilterableConfig.Enabled;
                 var indexSearchableConfig = f.GetCustomAttribute<IndexSearchableAttribute>();
                 if (indexSearchableConfig != null) p.IndexSearchable = indexSearchableConfig.Enabled;
+                var vectorizerp = f.GetCustomAttribute<VectorizerAttribute>();
+                if (vectorizerp !=  null) ConfigurePropertyModuleOptions(p, vectorizerp);
                 // FIXME: not supporting references yet
                 c.Properties.Add(p);
             }
@@ -120,6 +128,383 @@ namespace WeaviateNET
             var ret = new WeaviateClass<P>(nc);
             ret._connection = _connection;
             return ret;
+        }
+
+        private static void ConfigureClassModulueOptions<P>(WeaviateClass<P> c, VectorizerAttribute vectorizer) where P : class, new()
+        {
+            var vtype = vectorizer.GetType();
+            switch (vtype)
+            {
+                case Type when vtype == typeof(AWSVectorizerClassAttribute):
+                    var awsv = vectorizer as AWSVectorizerClassAttribute;
+                    if (awsv == null) throw new Exception("Vectorizer is not of type 'AWSVectorizerAttribute'");
+                    c.Vectorizer = AWSVectorizerClassAttribute.ModuleName;
+                    c.ModuleConfig = new Modules.Text2Vec.AWSClassModCfg()
+                    {
+                        Parameters = new Modules.Text2Vec.AWSClassModParams()
+                        {
+                            model = awsv.model,
+                            region = awsv.region,
+                            vectorizeClassName = awsv.vectorizeClassName
+                        }
+                    };
+                    break;
+
+                case Type when vtype == typeof(CohereVectorizerClassAttribute):
+                    var coherev = vectorizer as CohereVectorizerClassAttribute;
+                    if (coherev == null) throw new Exception("Vectorizer is not of type 'CohereVectorizerAttribute'");
+                    c.Vectorizer = CohereVectorizerClassAttribute.ModuleName;
+                    c.ModuleConfig = new Modules.Text2Vec.CohereClassModCfg()
+                    {
+                        Parameters = new Modules.Text2Vec.CohereClassModParams()
+                        {
+                            model = coherev.model,
+                            truncate = coherev.truncate,
+                            baseUrl = coherev.baseUrl,
+                            vectorizeClassName = coherev.vectorizeClassName
+                        }
+                    };
+                    break;
+
+                case Type when vtype == typeof(PalmVectorizerClassAttribute):
+                    var palmv = vectorizer as PalmVectorizerClassAttribute;
+                    if (palmv == null) throw new Exception("Vectorizer is not of type 'PalmVectorizerAttribute'");
+                    c.Vectorizer = PalmVectorizerClassAttribute.ModuleName;
+                    c.ModuleConfig = new Modules.Text2Vec.PalmClassModCfg()
+                    {
+                        Parameters = new Modules.Text2Vec.PalmClassModParams()
+                        {
+                            projectId = palmv.projectId,
+                            apiEndpoint = palmv.apiEndpoint,
+                            modelId = palmv.modelId,
+                            titleProperty = palmv.titleProperty,
+                            vectorizeClassName = palmv.vectorizeClassName
+                        }
+                    };
+                    break;
+
+                case Type when vtype == typeof(HuggingFaceVectorizerClassAttribute):
+                    var hfv = vectorizer as HuggingFaceVectorizerClassAttribute;
+                    if (hfv == null) throw new Exception("Vectorizer is not of type 'HuggingFaceVectorizerAttribute'");
+                    c.Vectorizer = HuggingFaceVectorizerClassAttribute.ModuleName;
+                    c.ModuleConfig = new Modules.Text2Vec.HuggingFaceClassModCfg()
+                    {
+                        Parameters = new Modules.Text2Vec.HuggingFaceClassModParams()
+                        {
+                            model = hfv.model,
+                            endpointURL = hfv.endpointURL,
+                            options = hfv.options,
+                            passageModel = hfv.passageModel,
+                            queryModel = hfv.queryModel,
+                            vectorizeClassName = hfv.vectorizeClassName
+                        }
+                    };
+                    break;
+
+                case Type when vtype == typeof(JinaAIVectorizerClassAttribute):
+                    var jinav = vectorizer as JinaAIVectorizerClassAttribute;
+                    if (jinav == null) throw new Exception("Vectorizer is not of type 'JinaAIVectorizerAttribute'");
+                    c.Vectorizer = JinaAIVectorizerClassAttribute.ModuleName;
+                    c.ModuleConfig = new Modules.Text2Vec.JinaAIClassModCfg()
+                    {
+                        Parameters = new Modules.Text2Vec.JinaAIClassModParams()
+                        {
+                            vectorizeClassName = jinav.vectorizeClassName,
+                            model = jinav.model
+                        }
+                    };
+                    break;
+
+                case Type when vtype == typeof(OpenAIVectorizerClassAttribute):
+                    var v = vectorizer as OpenAIVectorizerClassAttribute;
+                    if (v == null) throw new Exception("Vectorizer is not of type 'OpenAIVectorizerAttribute'");
+                    c.Vectorizer = OpenAIVectorizerClassAttribute.ModuleName;
+                    c.ModuleConfig = new Modules.Text2Vec.OpenAIClassModCfg()
+                    {
+                        Parameters = new Modules.Text2Vec.OpenAIClassModParams()
+                        {
+                            vectorizeClassName = v.vectorizeClassName,
+                            model = v.model,
+                            dimensions = v.dimensions,
+                            modelVersion = v.modelVersion,
+                            type = v.type,
+                            baseUrl = v.baseUrl
+                        }
+                    };
+                    break;
+
+                case Type when vtype == typeof(ContextionaryVectorizerClassAttribute):
+                    var cv = vectorizer as ContextionaryVectorizerClassAttribute;
+                    if (cv == null) throw new Exception("Vectorizer is not of type 'ContextionaryVectorizerAttribute'");
+                    c.Vectorizer = ContextionaryVectorizerClassAttribute.ModuleName;
+                    c.ModuleConfig = new Modules.Text2Vec.ContextionaryClassModCfg()
+                    {
+                        Parameters = new Modules.Text2Vec.ContextionaryClassModParams()
+                        {
+                            vectorizeClassName = cv.vectorizeClassName,
+                        }
+                    };
+                    break;
+
+                case Type when vtype == typeof(TransformersVectorizerClassAttribute):
+                    var tv = vectorizer as TransformersVectorizerClassAttribute;
+                    if (tv == null) throw new Exception("Vectorizer is not of type 'TransformersVectorizerAttribute'");
+                    c.Vectorizer = TransformersVectorizerClassAttribute.ModuleName;
+                    c.ModuleConfig = new Modules.Text2Vec.TransformersClassModCfg()
+                    {
+                        Parameters = new Modules.Text2Vec.TransformersClassModParams()
+                        {
+                            vectorizeClassName = tv.vectorizeClassName,
+                            poolingStrategy = tv.poolingStrategy
+                        }
+                    };
+                    break;
+
+                case Type when vtype == typeof(GPT4AllVectorizerClassAttribute):
+                    var gpt4v = vectorizer as GPT4AllVectorizerClassAttribute;
+                    if (gpt4v == null) throw new Exception("Vectorizer is not of type 'GPT4AllVectorizerAttribute'");
+                    c.Vectorizer = GPT4AllVectorizerClassAttribute.ModuleName;
+                    c.ModuleConfig = new Modules.Text2Vec.GPT4AllClassModCfg()
+                    {
+                        Parameters = new Modules.Text2Vec.GPT4AllClassModParams()
+                        {
+                            vectorizeClassName = gpt4v.vectorizeClassName
+                        }
+                    };
+                    break;
+
+                case Type when vtype == typeof(NeuralVectorizerClassAttribute):
+                    var nv = vectorizer as NeuralVectorizerClassAttribute;
+                    if (nv == null) throw new Exception("Vectorizer is not of type 'NeuralVectorizerAttribute'");
+                    c.Vectorizer = NeuralVectorizerClassAttribute.ModuleName;
+                    c.ModuleConfig = new Modules.Img2Vec.NeuralClassModCfg()
+                    {
+                        Parameters = new Modules.Img2Vec.NeuralClassModParams()
+                        {
+                            imageFields = nv.imageFields
+                        }
+                    };
+                    break;
+
+                case Type when vtype == typeof(ClipVectorizerClassAttribute):
+                    var clv = vectorizer as ClipVectorizerClassAttribute;
+                    if (clv == null) throw new Exception("Vectorizer is not of type 'ClipVectorizerAttribute'");
+                    c.Vectorizer = ClipVectorizerClassAttribute.ModuleName;
+                    c.ModuleConfig = new Modules.Multi2Vec.ClipClassModCfg()
+                    {
+                        Parameters = new Modules.Multi2Vec.ClipClassModParams()
+                        {
+                            vectorizeClassName = clv.vectorizeClassName,
+                            imageFields = clv.imageFields,
+                            textFields = clv.textFields,
+                            weights = clv.weights
+
+                        }
+                    };
+                    break;
+
+                case Type when vtype == typeof(BindVectorizerClassAttribute):
+                    var bv = vectorizer as BindVectorizerClassAttribute;
+                    if (bv == null) throw new Exception("Vectorizer is not of type 'BindVectorizerAttribute'");
+                    c.Vectorizer = BindVectorizerClassAttribute.ModuleName;
+                    c.ModuleConfig = new Modules.Multi2Vec.BindClassModCfg()
+                    {
+                        Parameters = new Modules.Multi2Vec.BindClassModParams()
+                        {
+                            vectorizeClassName = bv.vectorizeClassName,
+                            imageFields = bv.imageFields,
+                            textFields = bv.textFields,
+                            audioFields = bv.audioFields,
+                            videoFields = bv.videoFields,
+                            thermalFields = bv.thermalFields,
+                            depthFields = bv.depthFields,
+                            IMUFields = bv.IMUFields,
+                            weights = bv.weights
+                        }
+                    };
+                    break;
+
+                case Type when vtype == typeof(CentroidVectorizerClassAttribute):
+                    var cev = vectorizer as CentroidVectorizerClassAttribute;
+                    if (cev == null) throw new Exception("Vectorizer is not of type 'CentroidVectorizerAttribute'");
+                    c.Vectorizer = CentroidVectorizerClassAttribute.ModuleName;
+                    break;
+
+                case Type when vtype == typeof(RerankerCohereVectorizerClassAttribute):
+                    var rcv = vectorizer as RerankerCohereVectorizerClassAttribute;
+                    if (rcv == null) throw new Exception("Vectorizer is not of type 'RerankerCohereVectorizerAttribute'");
+                    c.Vectorizer = RerankerCohereVectorizerClassAttribute.ModuleName;
+                    c.ModuleConfig = new Modules.Reranker.RerankerCohereClassModCfg()
+                    {
+                        Parameters = new Modules.Reranker.RerankerCohereClassModParams()
+                        {
+                            model = rcv.model
+                        }
+                    };
+                    break;
+
+                case Type when vtype == typeof(RerankerTransformersVectorizerClassAttribute):
+                    var rtv = vectorizer as RerankerTransformersVectorizerClassAttribute;
+                    if (rtv == null) throw new Exception("Vectorizer is not of type 'RerankerTransformersVectorizerAttribute'");
+                    c.Vectorizer = RerankerTransformersVectorizerClassAttribute.ModuleName;
+                    c.ModuleConfig = new Modules.Reranker.RerankerTransformersClassModCfg()
+                    {
+                        Parameters = new Modules.Reranker.RerankerTransformersClassModParams()
+                        {
+                        }
+                    };
+                    break;
+            }
+        }
+
+        private static void ConfigurePropertyModuleOptions(Property p, VectorizerAttribute vectorizerp)
+        {
+            var vtype = vectorizerp.GetType();
+            switch (vtype)
+            {
+                case Type when vtype == typeof(AWSVectorizerPropertyAttribute):
+                    var awsv = vectorizerp as AWSVectorizerPropertyAttribute;
+                    if (awsv == null) throw new Exception("Vectorizer is not of type 'AWSVectorizerPropertyAttribute'");
+                    p.ModuleConfig = new Modules.Text2Vec.AWSPropertyModCfg()
+                    {
+                        Parameters = new Modules.Text2Vec.AWSPropertyModParams()
+                        {
+                            vectorizePropertyName = awsv.vectorizePropertyName,
+                            skip = awsv.skip
+                        }
+                    };
+                    break;
+
+                case Type when vtype == typeof(CohereVectorizerPropertyAttribute):
+                    var coherev = vectorizerp as CohereVectorizerPropertyAttribute;
+                    if (coherev == null) throw new Exception("Vectorizer is not of type 'CohereVectorizerPropertyAttribute'");
+                    p.ModuleConfig = new Modules.Text2Vec.CoherePropertyModCfg()
+                    {
+                        Parameters = new Modules.Text2Vec.CoherePropertyModParams()
+                        {
+                            vectorizePropertyName = coherev.vectorizePropertyName,
+                            skip = coherev.skip
+                        }
+                    };
+                    break;
+
+                case Type when vtype == typeof(PalmVectorizerPropertyAttribute):
+                    var palmv = vectorizerp as PalmVectorizerPropertyAttribute;
+                    if (palmv == null) throw new Exception("Vectorizer is not of type 'PalmVectorizerPropertyAttribute'");
+                    p.ModuleConfig = new Modules.Text2Vec.PalmPropertyModCfg()
+                    {
+                        Parameters = new Modules.Text2Vec.PalmPropertyModParams()
+                        {
+                            vectorizePropertyName = palmv.vectorizePropertyName,
+                            skip = palmv.skip
+                        }
+                    };
+                    break;
+
+                case Type when vtype == typeof(HuggingFaceVectorizerPropertyAttribute):
+                    var hfv = vectorizerp as HuggingFaceVectorizerPropertyAttribute;
+                    if (hfv == null) throw new Exception("Vectorizer is not of type 'HuggingFaceVectorizerPropertyAttribute'");
+                    p.ModuleConfig = new Modules.Text2Vec.HuggingFacePropertyModCfg()
+                    {
+                        Parameters = new Modules.Text2Vec.HuggingFacePropertyModParams()
+                        {
+                            vectorizePropertyName = hfv.vectorizePropertyName,
+                            skip = hfv.skip
+                        }
+                    };
+                    break;
+
+                case Type when vtype == typeof(JinaAIVectorizerPropertyAttribute):
+                    var jinav = vectorizerp as JinaAIVectorizerPropertyAttribute;
+                    if (jinav == null) throw new Exception("Vectorizer is not of type 'JinaAIVectorizerPropertyAttribute'");
+                    p.ModuleConfig = new Modules.Text2Vec.JinaAIPropertyModCfg()
+                    {
+                        Parameters = new Modules.Text2Vec.JinaAIPropertyModParams()
+                        {
+                            skip = jinav.skip,
+                            vectorizePropertyName = jinav.vectorizePropertyName
+                        }
+                    };
+                    break;
+
+                case Type when vtype == typeof(OpenAIVectorizerPropertyAttribute):
+                    var v = vectorizerp as OpenAIVectorizerPropertyAttribute;
+                    if (v == null) throw new Exception("Vectorizer is not of type 'OpenAIVectorizerPropertyAttribute'");
+                    p.ModuleConfig = new Modules.Text2Vec.OpenAIPropertyModCfg()
+                    {
+                        Parameters = new Modules.Text2Vec.OpenAIPropertyModParams()
+                        {
+                            vectorizePropertyName = v.vectorizePropertyName,
+                            skip = v.skip
+                        }
+                    };
+                    break;
+
+                case Type when vtype == typeof(ContextionaryVectorizerPropertyAttribute):
+                    var cv = vectorizerp as ContextionaryVectorizerPropertyAttribute;
+                    if (cv == null) throw new Exception("Vectorizer is not of type 'ContextionaryVectorizerPropertyAttribute'");
+                    p.ModuleConfig = new Modules.Text2Vec.ContextionaryPropertyModCfg()
+                    {
+                        Parameters = new Modules.Text2Vec.ContextionaryPropertyModParams()
+                        {
+                            skip = cv.skip,
+                            vectorizePropertyName = cv.vectorizePropertyName
+                        }
+                    };
+                    break;
+
+                case Type when vtype == typeof(TransformersVectorizerPropertyAttribute):
+                    var tv = vectorizerp as TransformersVectorizerPropertyAttribute;
+                    if (tv == null) throw new Exception("Vectorizer is not of type 'TransformersVectorizerPropertyAttribute'");
+                    p.ModuleConfig = new Modules.Text2Vec.TransformersPropertyModCfg()
+                    {
+                        Parameters = new Modules.Text2Vec.TransformersPropertyModParams()
+                        {
+                            vectorizePropertyName = tv.vectorizePropertyName,
+                            skip = tv.skip
+                        }
+                    };
+                    break;
+
+                case Type when vtype == typeof(GPT4AllVectorizerPropertyAttribute):
+                    var gpt4v = vectorizerp as GPT4AllVectorizerPropertyAttribute;
+                    if (gpt4v == null) throw new Exception("Vectorizer is not of type 'GPT4AllVectorizerPropertyAttribute'");
+                    p.ModuleConfig = new Modules.Text2Vec.GPT4AllPropertyModCfg()
+                    {
+                        Parameters = new Modules.Text2Vec.GPT4AllPropertyModParams()
+                        {
+                            skip = gpt4v.skip,
+                            vectorizePropertyName = gpt4v.vectorizePropertyName
+                        }
+                    };
+                    break;
+
+                case Type when vtype == typeof(ClipVectorizerPropertyAttribute):
+                    var clv = vectorizerp as ClipVectorizerPropertyAttribute;
+                    if (clv == null) throw new Exception("Vectorizer is not of type 'ClipVectorizerPropertyAttribute'");
+                    p.ModuleConfig = new Modules.Multi2Vec.ClipPropertyModCfg()
+                    {
+                        Parameters = new Modules.Multi2Vec.ClipPropertyModParams()
+                        {
+                            skip = clv.skip,
+                            vectorizePropertyName = clv.vectorizePropertyName
+                        }
+                    };
+                    break;
+
+                case Type when vtype == typeof(BindVectorizerPropertyAttribute):
+                    var bv = vectorizerp as BindVectorizerPropertyAttribute;
+                    if (bv == null) throw new Exception("Vectorizer is not of type 'BindVectorizerPropertyAttribute'");
+                    p.ModuleConfig = new Modules.Multi2Vec.BindPropertyModCfg()
+                    {
+                        Parameters = new Modules.Multi2Vec.BindPropertyModParams()
+                        {
+                            skip = bv.skip,
+                            vectorizePropertyName = bv.vectorizePropertyName
+                        }
+                    };
+                    break;
+            }
         }
 
         public WeaviateClass<P>? GetClass<P>(string name) where P : class, new()

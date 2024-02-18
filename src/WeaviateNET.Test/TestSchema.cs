@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using System.Collections;
 using System.Text.RegularExpressions;
 using WeaviateNET;
+using WeaviateNET.Modules;
 
 namespace WeaviateNET.Test
 {
@@ -61,6 +62,29 @@ namespace WeaviateNET.Test
         public WeaviateRef[]? multipleMovieRef;
     }
 
+    /// <summary>
+    /// Example of property definition. Notice that you *should* use only
+    /// public fields with low case names (otherwise serialization/deserialization may fail).
+    /// Weaviate corrects property names into lower case.
+    /// </summary>
+    [VectorIndexConfig(Distance = DistanceMetric.Dot),
+     OpenAIVectorizerClass(model = "text-embedding-3-large", dimensions = 3072, type = "text"),
+     IndexNullState]
+    public class DocumentWithVectorizer
+    {
+        [JsonIgnore]
+        public Guid? id;
+
+        public int intData;
+        public string? textData;
+        [OpenAIVectorizerProperty(skip = true)]
+        public string? notIndexedHere;
+        public DateTime dateData;
+        public DateTime? optionalDate;
+        [Tokenization(PropertyTokenization.Whitespace)]
+        public string[]? textArrayData;
+    }
+
     [TestClass]
     public class TestSchema
     {
@@ -116,6 +140,22 @@ namespace WeaviateNET.Test
             await weaviateDB.Schema.Update();
             var n = weaviateDB.Schema.Classes.Count();
             var c = await weaviateDB.Schema.NewClass<NoProperties>(name);
+            await weaviateDB.Schema.Update();
+            Assert.AreEqual(n + 1, weaviateDB.Schema.Classes.Count());
+            Assert.AreEqual(c.Name, name);
+            await c.Delete();
+            await weaviateDB.Schema.Update();
+            Assert.AreEqual(n, weaviateDB.Schema.Classes.Count());
+        }
+
+        [TestMethod]
+        public async Task TestCreateClassWithVectorizerAttribute()
+        {
+            Assert.IsNotNull(weaviateDB);
+            var name = $"Test{DateTime.Now.Ticks}";
+            await weaviateDB.Schema.Update();
+            var n = weaviateDB.Schema.Classes.Count();
+            var c = await weaviateDB.Schema.NewClass<DocumentWithVectorizer>(name);
             await weaviateDB.Schema.Update();
             Assert.AreEqual(n + 1, weaviateDB.Schema.Classes.Count());
             Assert.AreEqual(c.Name, name);

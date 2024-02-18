@@ -7173,7 +7173,6 @@ namespace WeaviateNET
         /// </summary>
         [Newtonsoft.Json.JsonProperty("vectorizer", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string Vectorizer { get; set; }
-
     }
 
     /// <summary>

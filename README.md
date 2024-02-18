@@ -10,9 +10,12 @@ be detected at compile time.
 It is designed to manipulate Weaviate objects and not just to adapt the
 connection to some LLM framework as other NuGet packages do.
 
-## What's new in version 1.23.7.1
+## What's new in version 1.23.9.1
+**important**: This is a major release of the library. Now configuration of modules is fully
+supported through attributes.
 
-- Tested against version 1.23.7 of Weaviate
+- Tested against version 1.23.9 of Weaviate
+- Added support for module configuration both at class and property level
 
 ## Version 1.21.6.2
 
